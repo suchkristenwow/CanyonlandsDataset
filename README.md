@@ -9,6 +9,8 @@ This repository provides a set of scripts that:
 - Stitch image frames into coherent sets for cross-seasonal analysis
 - Compare sets of frames for visual changes over time
 
+![Husky_pic](imgs/20221108_100625.jpg)
+
 ---
 
 ## 🧰 Key Features
@@ -19,15 +21,20 @@ This repository provides a set of scripts that:
 
 ---
 
-## 📁 Repository Structure
+## 📁 Structure
+
+---
+
+## 📁 Dataset Structure
 
 ---
 
 ## Getting Started
 
-### 1. Clone the Repository
-### 2. Install Dependencies 
-### 3. Example Usage
+### 1. Download the Data
+### 2. Clone the Repository
+### 3. Install Dependencies 
+### 4. Example Usage
 
 
 ## Example Output
