@@ -9,7 +9,7 @@ This repository provides a set of scripts that:
 - Stitch image frames into coherent sets for cross-seasonal analysis
 - Compare sets of frames for visual changes over time
 
-![Husky_pic](imgs/20221108_100625.jpg)
+<p align="center"> <img src="imgs/20221108_100625.jpg" width="600"/> </p>
 
 ---
 
