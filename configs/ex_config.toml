@@ -1,0 +1,11 @@
+[paths]
+may_results = "May_results"
+nov_results = "Nov_results"
+match_output_dir = "/media/kristen/easystore3/matches_fused"
+may_images = "/media/kristen/easystore3/RestorebotData/May2022_backups/1conmod/down_imgs"
+nov_left_images = "/media/kristen/easystore3/RestorebotData/Nov2022/Nov6/1conmod/down_imgs"
+nov_right_images = "/media/kristen/easystore3/RestorebotData/Nov2022/Nov6/1conmod/down_imgs1"
+
+[stitching]
+crop = false
+confidence_threshold = 0.25

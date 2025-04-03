@@ -21,8 +21,6 @@ This repository provides a set of scripts that:
 
 ## 📁 Repository Structure
 
-seasonal_frame_tools/ ├── gps_frame_search.py # Find matching frames across seasons by GPS location ├── ellipsoid_filter.py # Group frames within a localization ellipsoid ├── frame_stitcher.py # Stitch matched frames into sets for comparison ├── compare_sets.py # Visual/structural comparison tools for frame sets ├── utils/ │ └── gps_utils.py # Helper functions for GPS & ENU conversions ├── README.md # You’re here! └── requirements.txt # Python dependencies
-
 ---
 
 ## Getting Started
