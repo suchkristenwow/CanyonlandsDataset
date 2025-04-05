@@ -2,7 +2,7 @@
 
 # VERSION_TAG=1.0
 DOCKERFILE="./docker/Dockerfile_ROS2"
-IMAGE_TAG="cu_multi_ros2"
+IMAGE_TAG="canyonlands_dataset_ros2"
 BUILD_CONTEXT="."
 
 # Use the specified Dockerfile in the Docker build command
