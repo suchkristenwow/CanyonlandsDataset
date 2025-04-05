@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DOCKERFILE="./docker/Dockerfile_ros1"
-IMAGE_TAG="cu_multi_ros1"
+IMAGE_TAG="canyonlands_dataset_ros1"
 BUILD_CONTEXT="."
 
 # Use the specified Dockerfile in the Docker build command
