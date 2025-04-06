@@ -215,7 +215,7 @@ def main(args=None):
 
     # Path to root of CU-MULTI Dataset directory
     dataset_root_dir = '/root/Datasets/canyonlands_dataset'
-    environment = "1conmod"
+    environment = "1conmod_Nov2022"
     datapath = os.path.join(dataset_root_dir, environment)
 
     ROS2BagCreator(dataset_root_dir, environment)
