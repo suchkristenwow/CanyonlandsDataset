@@ -17,7 +17,7 @@ This repository provides a set of scripts that:
 
 - **GPS-Based Frame Matching**: Efficiently search and retrieve frames within spatial proximity across seasonal datasets.
 - **Covariance Ellipsoid Filtering**: Select only those sets of frames that lie within a statistically meaningful localization boundary.
-- **Temporal Stitching & Comparison**: Align and analyze matched frame sets to observe environmental or scene-level changes between seasons.
+- **Temporal Stitching & Comparison**: Compare matched frame sets to observe environmental or scene-level changes between seasons.
 
 ---
 
