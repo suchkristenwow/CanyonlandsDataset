@@ -4,7 +4,91 @@ import numpy as np
 import glob  
 from geopy.distance import geodesic
 from collections import defaultdict, deque
-from seasonal_comparison.image_stitching_utils import robust_load_csv
+from seasonal_comparison.general_utils import robust_load_csv
+from shapely.geometry import MultiPoint 
+from matplotlib.patches import Polygon as MplPolygon 
+import matplotlib.pyplot as plt 
+
+def debug_corner_distances(corners, tol=0.2):
+    """
+    corners: list of (lon, lat) tuples
+    tol: fractional tolerance for grouping distances (e.g., 0.5 = 50%)
+    
+    Returns a dict grouping distances and prints a warning if > 2 unique groups
+    """
+    if len(corners) != 4:
+        print(f"[⚠️] Expected 4 corners but got {len(corners)}")
+        return {}
+
+    centroid = MultiPoint(corners).centroid
+    centroid_latlon = (centroid.y, centroid.x)
+
+    dists = []
+    for i, (lon, lat) in enumerate(corners):
+        d = geodesic(centroid_latlon, (lat, lon)).meters
+        dists.append((i, d))
+
+    # Group by distance buckets (with tolerance)
+    grouped = []
+    for i, d in dists:
+        placed = False
+        for group in grouped:
+            if abs(d - group[0][1]) / group[0][1] < tol:
+                group.append((i, d))
+                placed = True
+                break
+        if not placed:
+            grouped.append([(i, d)])
+
+    if len(grouped) > 2:
+        return False 
+        """
+        print(f"[❌] Corner distance inconsistency: {len(grouped)} unique distance groups")
+        for group in grouped:
+            print("  Group:", [f"idx {i} = {round(dist,1)} m" for i, dist in group])
+        print("  Corners (lon, lat):", corners)
+        
+        fig, ax = plt.subplots(figsize=(5, 5))
+        # Order them clockwise
+        try:
+            centroid = MultiPoint(corners).centroid
+            corners.sort(key=lambda point: np.arctan2(point[1] - centroid.y, point[0] - centroid.x))
+        except Exception as e:
+            print(f"[!] Failed to sort corners: {e}")
+
+        # Re-check uniqueness after sorting
+        unique = []
+        for pt in corners:
+            if not any(np.linalg.norm(np.array(pt) - np.array(other)) < 1e-9 for other in unique):
+                unique.append(pt)
+
+        if len(unique) < 4:
+            print(f"[⚠️] Only {len(unique)} unique corners after sorting for {sub_path}")
+            print("Corners:", corners)
+            input("pause to acknowledge")
+
+        # Plot
+        poly = MplPolygon(corners, closed=True, edgecolor='none',
+                        facecolor='blue', alpha=0.15)
+        ax.add_patch(poly)
+
+        for corner in corners:
+            ax.scatter(corner[0],corner[1],color='red')
+
+        all_lons = [x[0] for x in corners]
+        all_lats = [x[1] for x in corners] 
+
+        if all_lons and all_lats:
+            ax.set_xlim(min(all_lons), max(all_lons))
+            ax.set_ylim(min(all_lats), max(all_lats))
+
+        # Save to file
+        output_path = "./polygon_corners_plot.png"
+        plt.savefig(output_path)
+        plt.close()
+        """ 
+
+    return True 
 
 def is_inside_ellipse(cov_matrix, center, point, threshold=1.0):
     delta = np.array(point) - np.array(center)

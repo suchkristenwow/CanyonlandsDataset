@@ -1,11 +1,83 @@
 import numpy as np 
 import math 
 import os 
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, MultiPoint
 import cv2 as cv
 import itertools
 import tempfile
 import matplotlib.pyplot as plt 
+import shutil 
+import gc 
+from matplotlib.patches import Polygon as MplPolygon 
+import psutil 
+from seasonal_comparison.gps_utils import debug_corner_distances 
+from seasonal_comparison.general_utils import robust_load_csv
+
+MAX_FUSED_IMG_PX = 250*10**(3)
+
+def check_all_same_size(image_paths):
+    """
+    Returns True if all images have the same (height, width), otherwise False.
+    Also returns the shape of the first image and the path of any mismatched ones.
+    """
+    if not image_paths:
+        print("[!] No image paths provided.")
+        return True, None, []
+
+    ref_shape = None
+    mismatches = []
+
+    for i, path in enumerate(image_paths):
+        img = cv.imread(path)
+        if img is None:
+            print(f"[✗] Failed to load image: {path}")
+            continue
+
+        h, w = img.shape[:2]
+
+        if ref_shape is None:
+            ref_shape = (h, w)
+        elif (h, w) != ref_shape:
+            mismatches.append((path, (h, w)))
+
+    all_same = len(mismatches) == 0
+    return all_same, ref_shape, mismatches
+
+def check_corner_uniqueness(corners, tol=1e-7):
+    """
+    Parameters:
+        corners (list of (lon, lat)): List of tuples with GPS coordinates.
+        tol (float): Tolerance for coordinate equality (in degrees).
+    
+    Returns:
+        (bool, str): (is_valid, reason_for_failure or 'OK')
+    """
+    if len(corners) != 4:
+        return False, "Expected 4 corners"
+
+    unique = []
+    for pt in corners:
+        if not any(np.linalg.norm(np.array(pt) - np.array(other)) < tol for other in unique):
+            unique.append(pt)
+
+    if len(unique) < 4:
+        return False, f"Only {len(unique)} unique corners"
+
+    try:
+        poly = Polygon(corners)
+        if not poly.is_valid:
+            return False, "Invalid polygon geometry"
+        if len(poly.exterior.coords) != 5:  # 4 corners + closing point
+            return False, f"Got {len(poly.exterior.coords)} exterior points"
+    except Exception as e:
+        return False, str(e)
+
+    return True, "OK"
+
+def is_memory_critical(threshold=0.90):
+    """Returns True if memory usage is above threshold (e.g., 90%)"""
+    mem = psutil.virtual_memory()
+    return mem.percent / 100.0 > threshold
 
 def downscale_images(image_paths, scale=0.5):
     downscaled_paths = []
@@ -18,34 +90,6 @@ def downscale_images(image_paths, scale=0.5):
         cv.imwrite(temp_path, resized)
         downscaled_paths.append(temp_path)
     return downscaled_paths
-
-def robust_load_csv(path, min_cols=4, skip_header=1):
-    import numpy as np
-
-    data = np.genfromtxt(path,skip_header=skip_header) 
-
-    try:
-        if not np.isnan(data).all():
-            print(f"✅ Loaded annotations using no delimiter")
-            return data
-    except:
-        print("path:",path)
-        print(data)
-
-    delimiters = [',', '\t', ';']
-    for delim in delimiters:
-        try:
-            data = np.genfromtxt(path, delimiter=delim, skip_header=skip_header)
-            if data.ndim == 1:
-                data = np.expand_dims(data, axis=0)
-
-            if not np.isnan(data).all() and data.shape[1] >= min_cols:
-                #print(f"✅ Loaded annotations using delimiter '{delim}'")
-                return data
-        except Exception as e:
-            print(f"⚠️ Failed to load with delimiter '{delim}': {e}")
-
-    raise ValueError(f"❌ Failed to load usable data from {path} with common delimiters.")
 
 def get_yaw_from_quaternion(qx, qy, qz, qw):
     # Assuming robot moves in 2D (flat ground)
@@ -170,8 +214,91 @@ def make_image_path_dict(image_paths):
 
     return image_path_coords
 
-def chunk_list(lst, chunk_size=10):
-    return [lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size)]
+def stitch_within_size_limit(chunk, stitcher, tmp_dir, chunk_id, max_px=MAX_FUSED_IMG_PX, max_recursion=2):
+    """
+    Returns:
+        dict {output_path: [input_image_paths]}
+    """
+    result_dict = {}
+
+    if not chunk or max_recursion < 0 or len(chunk) < 2:
+        print(f"[!] Cannot stitch chunk {chunk_id} — falling back to saving individual images")
+        for j, path in enumerate(chunk):
+            img = cv.imread(path)
+            if img is None:
+                continue
+            out_path = os.path.join(tmp_dir, f"chunk_{chunk_id}_{j}.png")
+            cv.imwrite(out_path, img)
+            result_dict[out_path] = [path]
+        return result_dict
+
+    est_fused_px, _ = estimate_fused_image_size(chunk)
+    print(f"est_fused_px: {est_fused_px}")
+
+    if est_fused_px < max_px:
+        if not check_all_same_size(chunk)[0]:
+            raise OSError(f"[✗] Images in chunk {chunk_id} not same size")
+        stitched_img = stitcher.stitch(chunk)
+        if stitched_img is not None:
+            stitched = crop_connected_region(stitched_img)
+            out_path = os.path.join(tmp_dir, f"chunk_{chunk_id}.png")
+            cv.imwrite(out_path, stitched)
+            result_dict[out_path] = chunk
+            print(f"[✓] Wrote stitched chunk {chunk_id} to {out_path}")
+            del stitched_img, stitched
+        else:
+            print(f"[✗] Stitching returned None for chunk {chunk_id}")
+    else:
+        print(f"[⚠️] Chunk {chunk_id} too large — trying to split further")
+        mid = len(chunk) // 2
+        left_results = stitch_within_size_limit(chunk[:mid], stitcher, tmp_dir, f"{chunk_id}_0", max_px, max_recursion - 1)
+        right_results = stitch_within_size_limit(chunk[mid:], stitcher, tmp_dir, f"{chunk_id}_1", max_px, max_recursion - 1)
+        result_dict.update(left_results)
+        result_dict.update(right_results)
+
+    return result_dict
+
+def chunk_list(image_paths, max_delta_t=0.5, max_chunk_size=5):
+    """
+    Groups image paths into chunks where timestamps are within max_delta_t seconds.
+    Each chunk is capped at max_chunk_size.
+
+    Args:
+        image_paths (list of str): Paths to images, with timestamps in filenames.
+        max_delta_t (float): Maximum allowed time difference between consecutive images.
+        max_chunk_size (int): Maximum number of images per chunk.
+
+    Returns:
+        List of chunks (list of lists of paths).
+    """
+    # Filter and sort
+    paths_with_time = [(p, extract_timestamp_from_path(p)) for p in image_paths]
+    paths_with_time = [(p, t) for p, t in paths_with_time if t is not None]
+    paths_with_time.sort(key=lambda x: x[1])  # sort by time
+    #print("paths_with_time: ",paths_with_time)
+
+    chunks = []
+    current_chunk = []
+
+    for i, (path, ts) in enumerate(paths_with_time):
+        if not current_chunk:
+            current_chunk.append((path, ts))
+            continue
+
+        _, last_ts = current_chunk[-1]
+        #print("ts-last_ts:",abs(ts - last_ts))
+        if abs(ts - last_ts) <= max_delta_t and len(current_chunk) < max_chunk_size:
+            current_chunk.append((path, ts))
+        else:
+            if len(current_chunk) >= 2:
+                chunks.append([p for p, _ in current_chunk])
+            current_chunk = [(path, ts)]
+
+    # Add final chunk if valid
+    if len(current_chunk) >= 2:
+        chunks.append([p for p, _ in current_chunk])
+
+    return chunks
 
 def filter_imgs_by_overlap(image_path_coords, iou_threshold=0.95):
     polygons = {}
@@ -211,7 +338,7 @@ def filter_imgs_by_overlap(image_path_coords, iou_threshold=0.95):
         if not has_overlap:
             # print("this path has no overlap ... removing")
             kept_paths.discard(path_i)
-    print("keeping {} images".format(len(kept_paths)))
+    #print("keeping {} images".format(len(kept_paths)))
     return sorted(kept_paths)
 
 def crop_connected_region(image, area_thresh_ratio=0.05):
@@ -239,36 +366,150 @@ def crop_connected_region(image, area_thresh_ratio=0.05):
 
     return cropped
 
-def fuse_chunks(chunk_paths, stitcher, out_dir=None):
+def resize_and_save_images_uniform(image_paths, tmp_dir, target_size=None):
+    """
+    Resize all images to a uniform size (width, height), save to tmp_dir, and return new paths.
+    """
+    resized_paths = []
+    for i, path in enumerate(image_paths):
+        img = cv.imread(path)
+        if img is None:
+            raise IOError(f"Failed to load image: {path}")
+
+        if target_size is None:
+            target_size = (img.shape[1], img.shape[0])  # (width, height)
+
+        resized = cv.resize(img, target_size)
+        new_path = os.path.join(tmp_dir, f"uniform_{i}.png")
+        cv.imwrite(new_path, resized)
+        resized_paths.append(new_path)
+
+    return resized_paths
+
+def estimate_fused_image_size(image_paths):
+    """
+    Roughly estimate the total width and height of the stitched image,
+    assuming simple horizontal or grid-like layout.
+
+    Returns:
+        total_pixels (int), (width, height)
+    """
+    total_width = 0
+    max_height = 0
+
+    for path in image_paths:
+        img = cv.imread(path)
+        if img is None:
+            continue
+        h, w = img.shape[:2]
+        total_width += w  # side-by-side assumption
+        max_height = max(max_height, h)
+        del img
+
+    total_pixels = total_width * max_height
+    return total_pixels, (total_width, max_height)
+
+def extract_timestamp_from_path(path):
+    name = os.path.basename(path)
+    if "downscaled" in name:
+        name = name.split("_downscaled")[0]
+    if "png" in name:
+        name = name[:-4]
+    try:
+        return int(name) * 1e-9
+    except:
+        print("Error: Could not extract timestamp!")
+        print("name: ",name)
+        print(os.path.basename(path))
+        print("path:",path)
+        raise OSError
+
+def fuse_chunks(chunk_paths, stitcher, out_dir=None, provenance_map=None):
     """
     Attempts to fuse image chunks and ensures that all chunks are represented in the result.
 
     Returns:
         dict: {fused_image_path: [list of input chunks used]}
     """
-    tmp_dir_built = False 
+    print("fusing chunks ...")
+    #Estimated fused image size:  (248668, (1162, 214))
+
+    downscaled_chunk_paths = downscale_images(chunk_paths)
+    resize_tmp_dir = tempfile.mkdtemp()
+
+    tmp_dir_built = False
     if out_dir is None:
         out_dir = tempfile.mkdtemp()
-        tmp_dir_built = True 
+        tmp_dir_built = True
     else:
         os.makedirs(out_dir, exist_ok=True)
 
-    unused = set(chunk_paths)
+    # Pre-resize all images once
+    print("Preprocessing resized images...")
+    resized_path_map = {}
+    target_size = None
+    for i, orig_path in enumerate(downscaled_chunk_paths):
+        img = cv.imread(orig_path)
+        if img is None:
+            continue
+        if target_size is None:
+            target_size = (img.shape[1], img.shape[0])  # width, height
+        resized = cv.resize(img, target_size)
+        resized_path = os.path.join(resize_tmp_dir, f"{i}.png")
+        cv.imwrite(resized_path, resized)
+        resized_path_map[orig_path] = resized_path
+        del img, resized
+        gc.collect()
+
+    unused = set(downscaled_chunk_paths)
     fused_results = {}
     fuse_id = 0
 
+    mem = psutil.virtual_memory()
+    print(f"[MEM] Used: {mem.used / 1e9:.2f} GB / {mem.total / 1e9:.2f} GB ({mem.percent}%)")
+
+    print("Entering the while loop.")
     while unused:
         base = unused.pop()
         group = [base]
         used = set()
 
         for other in unused:
+            mem = psutil.virtual_memory()
+            print(f"[MEM] Used: {mem.used / 1e9:.2f} GB / {mem.total / 1e9:.2f} GB ({mem.percent}%)")
+
+            test_paths = group + [other]
+            
+            if is_memory_critical(threshold=0.8):
+                print("[⚠️] Memory usage high — skipping further fusing for current group.")
+                break  # Stop trying to add more images to this group
+
             try:
-                test_paths = group + [other]
-                result = stitcher.stitch(test_paths)
+                uniform_paths = [resized_path_map[p] for p in test_paths]
+                #print("trying to fuse: {} paths".format(len(uniform_paths)))
+                #print("Estimated fused image size: ",estimate_fused_image_size(uniform_paths))
+                est_total_px, _ = estimate_fused_image_size(uniform_paths) 
+                if MAX_FUSED_IMG_PX <= est_total_px:
+                    print("[⚠️] WARNING Estimated image size too large.")
+                    continue 
+                
+                if is_memory_critical(threshold=0.75):
+                    print("Memory is critical - skipping stitching.")
+                    continue 
+                if not check_all_same_size(uniform_paths):
+                    raise OSError 
+                result = stitcher.stitch(uniform_paths)
                 if result is not None:
+                    #print("No result found :(")
                     group.append(other)
                     used.add(other)
+                #print("Stitching was safely completed!")
+                if len(group) >= 4:
+                    print("[ℹ️] Group size cap reached — stopping additions.")
+                    break
+                    
+                del result
+                gc.collect()
             except Exception as e:
                 print(f"[✗] Failed to stitch {group[-1]} with {other}: {e}")
                 continue
@@ -276,49 +517,126 @@ def fuse_chunks(chunk_paths, stitcher, out_dir=None):
         unused -= used
 
         try:
-            result = stitcher.stitch(group)
+            uniform_paths = [resized_path_map[p] for p in group]
+            est_total_px,_ = estimate_fused_image_size(uniform_paths) 
+            if MAX_FUSED_IMG_PX <= est_total_px:
+                print("[⚠️] WARNING Estimated image size too large.")
+                continue 
+            if not check_all_same_size(uniform_paths):
+                raise OSError
+            result = stitcher.stitch(uniform_paths)
             if result is not None:
+                result = crop_connected_region(result)
                 fused_path = os.path.join(out_dir, f"fused_{fuse_id}.png")
                 cv.imwrite(fused_path, result)
-                fused_results[fused_path] = group
+
+                if provenance_map:
+                    originals = []
+                    for chunk_path in group:
+                        originals.extend(provenance_map.get(chunk_path, [chunk_path]))
+                    fused_results[fused_path] = originals
+                else:
+                    fused_results[fused_path] = group
+
                 print(f"[✓] Saved fused image: {fused_path}")
+                del result
+                gc.collect()
             else:
-                # Fall back to using each chunk individually
+                #print("result is None...")
                 for chunk in group:
                     solo_img = cv.imread(chunk)
                     solo_out = os.path.join(out_dir, f"fused_{fuse_id}.png")
                     cv.imwrite(solo_out, solo_img)
-                    fused_results[solo_out] = [chunk]
+                    del solo_img
+                    if provenance_map:
+                        originals = provenance_map.get(chunk, [chunk])
+                        fused_results[solo_out] = originals
+                    else:
+                        fused_results[solo_out] = [chunk]
                     print(f"[•] Could not fuse — keeping {chunk} as its own")
                     fuse_id += 1
+                    if len(group) >= 4:
+                        print("Group size cap reached — stopping additions.")
+                        break
+                        
                 continue
+
         except Exception as e:
             print(f"[✗] Final stitch failed for group: {e}")
-            # Same fallback
             for chunk in group:
                 solo_img = cv.imread(chunk)
                 solo_out = os.path.join(out_dir, f"fused_{fuse_id}.png")
                 cv.imwrite(solo_out, solo_img)
-                fused_results[solo_out] = [chunk]
+                del solo_img
+                if provenance_map:
+                    originals = provenance_map.get(chunk, [chunk])
+                    fused_results[solo_out] = originals
+                else:
+                    fused_results[solo_out] = [chunk]
                 print(f"[•] Exception fallback: saved {chunk} as its own")
                 fuse_id += 1
             continue
 
         fuse_id += 1
+        print()
 
     if tmp_dir_built:
-        shutil.rmtree(out_dir) 
+        shutil.rmtree(out_dir)
+    shutil.rmtree(resize_tmp_dir)
 
     return fused_results
 
-def plot_stitched_summary_grid(fused_dict_may, fused_dict_nov, save_path, figsize=(25, 15)):
-    n_may = len(fused_dict_may)
-    n_nov = len(fused_dict_nov)
-    n_rows = max(n_may, n_nov)
-    
-    print("n_may: {}, n_nov: {}".format(n_may,n_nov))
+def plot_stitched_summary_grid(fused_dict_may, fused_dict_nov, save_path, figsize=(20, 15)):
+    def get_image_size(path):
+        img = cv.imread(path)
+        if img is None:
+            return 0
+        h, w = img.shape[:2]
+        return h * w
+
+    def get_unique_sorted_corners(corners, debug_path=None):
+        try:
+            if len(corners) != 4:
+                print(f"[⚠️] Expected 4 corners, got {len(corners)} — {debug_path}")
+                return []
+
+            centroid = MultiPoint(corners).centroid
+            corners.sort(key=lambda pt: np.arctan2(pt[1] - centroid.y, pt[0] - centroid.x))
+
+            unique = []
+            for pt in corners:
+                if not any(np.linalg.norm(np.array(pt) - np.array(other)) < 1e-9 for other in unique):
+                    unique.append(pt)
+
+            if len(unique) < 4:
+                print(f"[⚠️] Only {len(unique)} unique corners after sorting — {debug_path}")
+                print(f"  Corners: {corners}")
+                return []
+            return unique
+        except Exception as e:
+            print(f"[✗] Failed to process corners for {debug_path}: {e}")
+            return []
+
+    def safe_gps_lookup(path):
+        try:
+            return gps_lookup(path)
+        except Exception as e:
+            print(f"[!] gps_lookup failed for {path}: {e}")
+            return None
+
+    # --- Filter to top 6 largest images per season ---
+    may_sizes = [(p, get_image_size(p)) for p in fused_dict_may]
+    top_may = {p for p, _ in sorted(may_sizes, key=lambda x: x[1], reverse=True)[:6]}
+    fused_dict_may = {p: fused_dict_may[p] for p in top_may}
+
+    nov_sizes = [(p, get_image_size(p)) for p in fused_dict_nov]
+    top_nov = {p for p, _ in sorted(nov_sizes, key=lambda x: x[1], reverse=True)[:6]}
+    fused_dict_nov = {p: fused_dict_nov[p] for p in top_nov}
+
+    # --- Layout ---
+    n_rows = max(len(fused_dict_may), len(fused_dict_nov), 1)
     fig = plt.figure(figsize=figsize)
-    gs = fig.add_gridspec(n_rows, 3, width_ratios=[1, 1, 1])
+    gs = fig.add_gridspec(n_rows, 3, width_ratios=[1, 1.5, 1])  # wider center
 
     may_paths = list(fused_dict_may.keys())
     nov_paths = list(fused_dict_nov.keys())
@@ -326,75 +644,183 @@ def plot_stitched_summary_grid(fused_dict_may, fused_dict_nov, save_path, figsiz
     gps_ax = fig.add_subplot(gs[:, 1])
     gps_ax.set_title("Stitched Image GPS Footprints", fontsize=10)
 
-    # Left column — May images
+    # --- Plot May stitched images ---
     for i, path in enumerate(may_paths):
         img = cv.imread(path)
+        if img is None:
+            continue
         img_rgb = cv.cvtColor(img, cv.COLOR_BGR2RGB)
         ax = fig.add_subplot(gs[i, 0])
         ax.imshow(img_rgb)
-        ax.set_title(f"May {os.path.basename(path)}", fontsize=8)
+        ax.set_title(f"May {path.split('/')[-1]}", fontsize=8)
         ax.axis("off")
 
-        # Plot GPS rectangles
-        for input_img in fused_dict_may[path]:
-            corners = gps_lookup(input_img)
-            if corners and len(corners) == 4:
-                poly = MplPolygon(corners, closed=True, edgecolor='none', facecolor='blue', alpha=0.5)
+        for sub_path in fused_dict_may[path]:
+            corners = safe_gps_lookup(sub_path)
+            if corners is None: continue
+            corners = get_unique_sorted_corners(corners)
+            if len(corners) < 4: 
+                print("corners:",corners)
+                raise OSError
+            valid_corners = debug_corner_distances(corners)
+            if valid_corners:
+                poly = MplPolygon(corners, closed=True, facecolor='blue', alpha=0.15, edgecolor='none')
                 gps_ax.add_patch(poly)
 
-    # Right column — Nov images
+    # --- Plot Nov stitched images ---
     for i, path in enumerate(nov_paths):
         img = cv.imread(path)
+        if img is None:
+            continue
         img_rgb = cv.cvtColor(img, cv.COLOR_BGR2RGB)
         ax = fig.add_subplot(gs[i, 2])
         ax.imshow(img_rgb)
-        ax.set_title(f"Nov {os.path.basename(path)}", fontsize=8)
+        ax.set_title(f"Nov {path.split('/')[-1]}", fontsize=8)
         ax.axis("off")
 
-        for input_img in fused_dict_nov[path]:
-            corners = gps_lookup(input_img)
-            if corners and len(corners) == 4:
-                poly = MplPolygon(corners, closed=True, edgecolor='none', facecolor='red', alpha=0.5)
+        for sub_path in fused_dict_nov[path]:
+            corners = safe_gps_lookup(sub_path)
+            if corners is None: continue
+            corners = get_unique_sorted_corners(corners)
+            if len(corners) < 4: 
+                print(corners)
+                raise OSError
+            print("corners:",corners)
+            valid_corners = debug_corner_distances(corners)
+            if valid_corners: 
+                poly = MplPolygon(corners, closed=True, facecolor='red', alpha=0.15, edgecolor='none')
                 gps_ax.add_patch(poly)
 
+    # --- Finalize GPS plot ---
     gps_ax.set_xlabel("Longitude")
     gps_ax.set_ylabel("Latitude")
-    gps_ax.grid(True)
     gps_ax.set_aspect('equal', adjustable='box')
+    gps_ax.grid(True)
+    gps_ax.legend(handles=[
+        plt.Line2D([0], [0], color='blue', label='May'),
+        plt.Line2D([0], [0], color='red', label='Nov')
+    ], fontsize=8, loc='upper right')
 
-    blue_patch = plt.Line2D([0], [0], color='blue', label='May')
-    red_patch = plt.Line2D([0], [0], color='red', label='Nov')
-    gps_ax.legend(handles=[blue_patch, red_patch], loc="upper right", fontsize=8)
-    plt.show() 
-    
+    # Set GPS plot bounds
+    all_lons, all_lats = [], []
+    for d in [fused_dict_may, fused_dict_nov]:
+        for paths in d.values():
+            for p in paths:
+                corners = safe_gps_lookup(p)
+                if corners and len(corners) == 4:
+                    lons, lats = zip(*corners)
+                    all_lons.extend(lons)
+                    all_lats.extend(lats)
+    if all_lons and all_lats:
+        gps_ax.set_xlim(min(all_lons), max(all_lons))
+        gps_ax.set_ylim(min(all_lats), max(all_lats))
+    else:
+        print("[⚠️] No valid GPS corners found — using default bounds.")
+
+    # --- Save ---
     plt.tight_layout()
     plt.savefig(save_path, dpi=200)
     plt.close()
     print(f"[✓] Saved stitched summary with GPS footprints to: {save_path}")
 
+
 def gps_lookup(filepath):
     """
     Given the filepath of an image, return the gps coordinate of its corners
     """
-    result_dir = os.path.dirname(filepath)
-    frustrum_corners = robust_load_csv(os.path.join(result_dir,"processed_results/frustrum_corners.csv"))
-    timestamp = int(os.path.splitext(os.path.basename(filepath))[0]) * 10**(-9)
-    idx = np.argmin(frustrum_corners[:,0] - timestamp)
-    if np.abs(timestamp - frustrum_corners[idx,0]) > 0.2:
-        raise OSError 
+    #print("entered gps lookup ...")
+    result_dir = os.path.dirname(os.path.dirname(filepath))
+    if "Panos" in filepath:
+        #result_dir is in processed results already
+        result_dir = os.path.dirname(result_dir)
+        print("Result_dir: ",result_dir)
+        print("trying to load in this path:",os.path.join(result_dir,"frustrum_corners.csv"))
+        frustrum_corners = robust_load_csv(os.path.join(result_dir,"frustrum_corners.csv"))
+    else: 
+        #go up one level, into processed results
+        frustrum_corners = robust_load_csv(os.path.join(result_dir,"processed_results/frustrum_corners.csv"))
+    #print("filepath: ",filepath)
+    if "downscaled" in filepath:
+        cleaned_filepath = os.path.splitext(os.path.basename(filepath))[0]
+        underscore_idx = cleaned_filepath.index("_")
+        timestamp = int(cleaned_filepath[:underscore_idx]) * 10**(-9)
+    else:
+        print("filepath:",filepath)
+        timestamp = int(os.path.splitext(os.path.basename(filepath))[0]) * 10**(-9)
+
+    if not "Panos" in filepath:
+        idx = np.argmin(np.abs(frustrum_corners[:,0] - timestamp))
+        #print(f"[gps_lookup] Closest match to {timestamp:.6f} is {frustrum_corners[idx,0]:.6f} (Δt={abs(timestamp - frustrum_corners[idx,0]):.3f}s)")
+        if np.abs(timestamp - frustrum_corners[idx,0]) > 0.3:
+            delta_t = np.abs(timestamp - frustrum_corners[idx,0]) 
+            print("timestamp:",timestamp)
+            print("closest timestamp frustrum_corners:",frustrum_corners[idx,0])
+            print("delta_t:",delta_t)
+            input("WARNING ... CANNOT FIND CORRESPONDING FRUSTRUM CORNERS")
+            return None 
 
     if "May" in filepath:   
-        frustrum_corners = frustrum_corners[idx,15:] 
+        frustrum_corners = frustrum_corners[idx,17:] 
     elif "Nov" in filepath: 
         if "Left" in filepath:    
-            frustrum_corners = frustrum_corners[idx,17:23]
+            frustrum_corners = frustrum_corners[idx,17:25]
         elif "Right" in filepath: 
             frustrum_corners =  frustrum_corners[idx,25:33]
+
+    if frustrum_corners.shape[0] != 8:
+        print("filepath: ",filepath) 
+        print("len(frustrum_corners[idx,:]): ",len(frustrum_corners))
+        print(f"[!] Expected 8 GPS corner values, got {frustrum_corners.shape[0]} for {filepath}")
+        raise OSError
 
     corners = []
     for i in range(4):
         lat_i = frustrum_corners[i*2]
         lon_i = frustrum_corners[i*2 + 1]
-        corners.append((lat_i,lon_i)) 
-        
+        corners.append((lon_i, lat_i))  # correct order: (x, y)
+    """
+    valid,reason = check_corner_uniqueness(corners)
+    if not valid:
+        print("corners:",corners)
+        fig, ax = plt.subplots(figsize=(5, 5))
+        # Order them clockwise
+        try:
+            centroid = MultiPoint(corners).centroid
+            corners.sort(key=lambda point: np.arctan2(point[1] - centroid.y, point[0] - centroid.x))
+        except Exception as e:
+            print(f"[!] Failed to sort corners: {e}")
+
+        # Re-check uniqueness after sorting
+        unique = []
+        for pt in corners:
+            if not any(np.linalg.norm(np.array(pt) - np.array(other)) < 1e-9 for other in unique):
+                unique.append(pt)
+
+        if len(unique) < 4:
+            print(f"[⚠️] Only {len(unique)} unique corners after sorting for {sub_path}")
+            print("Corners:", corners)
+            input("pause to acknowledge")
+
+        # Plot
+        poly = MplPolygon(corners, closed=True, edgecolor='none',
+                        facecolor='blue', alpha=0.15)
+        ax.add_patch(poly)
+
+        all_lons = [x[0] for x in corners]
+        all_lats = [x[1] for x in corners] 
+
+        if all_lons and all_lats:
+            ax.set_xlim(min(all_lons), max(all_lons))
+            ax.set_ylim(min(all_lats), max(all_lats))
+
+        # Save to file
+        output_path = "./polygon_corners_plot.png"
+        plt.savefig(output_path)
+        plt.close()
+
+        raise OSError 
+    """
+    if len(corners) < 4:
+        raise OSError 
+
     return corners

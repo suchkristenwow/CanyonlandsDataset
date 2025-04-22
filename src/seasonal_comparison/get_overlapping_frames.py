@@ -17,17 +17,29 @@ from seasonal_comparison.gps_utils import (
 from seasonal_comparison.ellipse_utils import scale_covariance_to_degrees
 from seasonal_comparison.image_stitching_utils import (
     make_image_path_dict, 
-    robust_load_csv,
     chunk_list,
     crop_connected_region, 
     fuse_chunks,
     downscale_images,
-    plot_stitched_summary_grid
+    plot_stitched_summary_grid,
+    filter_imgs_by_overlap,
+    estimate_fused_image_size,
+    extract_timestamp_from_path,
+    check_all_same_size, 
+    stitch_within_size_limit
 )    
+from seasonal_comparison.general_utils import robust_load_csv
+
 import tempfile
 import shutil 
+import pickle 
+import psutil 
 
-import psutil
+MAX_FUSED_IMG_PX = 150*10**(3)
+
+def all_empty_or_none(d):
+    return all(v is None or v == [] for v in d.values())
+
 def log_mem(msg=""):
     usage = psutil.Process(os.getpid()).memory_info().rss / 1e9
     print(f"[{msg}] Memory: {usage:.2f} GB")
@@ -57,6 +69,8 @@ def find_closest_index(array, target, max_delta_t=None):
 def parse_args():
     parser = argparse.ArgumentParser(description="Fuse overlapping seasonal frames from May and Nov.")
     parser.add_argument("--config", type=str, required=True, help="Path to TOML config file")
+    parser.add_argument("--interactive", action="store_true", help="Enable interactive plot viewer")
+
     return parser.parse_args()
 
 def load_all_images(paths, scale=1.0):
@@ -77,13 +91,12 @@ def load_config(config_path):
 
 def stitch_images(image_paths, stitcher, out_dir):
     os.makedirs(out_dir, exist_ok=True)
-    print("image_paths:",len(image_paths))
-    print("set(image_paths)):",len(set(image_paths)))
-
     log_mem("Before stitching ...")
     if len(image_paths) < 10:
         print("There are fewer than 10 images — attempting direct stitch")
         try:
+            if not check_all_same_size(image_paths):
+                raise OSError 
             stitched_img = stitcher.stitch(image_paths)
             if stitched_img is not None:
                 stitched_img = crop_connected_region(stitched_img)
@@ -97,14 +110,7 @@ def stitch_images(image_paths, stitcher, out_dir):
     print(f"[i] Found {len(image_paths)} valid paths")
     path_dict = make_image_path_dict(image_paths)
 
-    """
-    filtered_img_paths = filter_imgs_by_overlap(path_dict)
-    print(f"[i] {len(filtered_img_paths)} paths after overlap filtering")
-    """ 
-    print("len(image_paths):",len(image_paths))
-    print("len(np.unique(image_paths)):",len(np.unique(image_paths)))
-
-    img_chunks = chunk_list(image_paths, chunk_size=10)
+    img_chunks = chunk_list(image_paths)
     print(f"[i] Processing {len(img_chunks)} chunks")
     
     tmp_img_chunk_dir = tempfile.mkdtemp()
@@ -113,50 +119,71 @@ def stitch_images(image_paths, stitcher, out_dir):
 
     for i, chunk in enumerate(img_chunks):
         log_mem("Before processing chunk i:{} ...".format(i))
-        print("there are {} images in this chunk".format(len(chunk)))
+
         chunk_dict = {}
         for path in chunk:
-            print("path:",path)
             chunk_dict[path] = path_dict[path]
-        print("chunk_dict:",chunk_dict)
-        input("Wait")
-        #filtered_chunk = filter_imgs_by_overlap(chunk_dict)
-        filtered_chunk = downscale_images(chunk_dict,scale=0.5)
-        print("filtered_chunk:",filtered_chunk)
+        filtered_chunk = filter_imgs_by_overlap(chunk_dict)
+        filtered_chunk = downscale_images(filtered_chunk,scale=0.5)
+
+        #print("filtered_chunk:",filtered_chunk)
         if len(filtered_chunk) < 2:
             print(f"[!] Skipping chunk {i} — too few images after filtering")
             continue
 
-        try:
-            stitched = stitcher.stitch(filtered_chunk)
-            if stitched is None:
-                print(f"[!] Stitching failed for chunk {i} — skipping")
-                continue
+        est_px_size,_ = estimate_fused_image_size(filtered_chunk)
 
-            stitched = crop_connected_region(stitched)
-            out_path = os.path.join(tmp_img_chunk_dir, f"chunk_{i}.png")
-            cv.imwrite(out_path, stitched)
-            chunk_output_paths.append(out_path)
-            chunk_to_original_paths[out_path] = filtered_chunk
-            print(f"[✓] Wrote stitched chunk {i} to {out_path}")
+        if MAX_FUSED_IMG_PX < est_px_size:
+            result_dict = stitch_within_size_limit(
+                filtered_chunk,
+                stitcher,
+                tmp_img_chunk_dir,
+                f"{i}",
+                max_px=MAX_FUSED_IMG_PX,
+                max_recursion=2
+            )
 
-            del stitched 
-            cv.waitKey(1)
+            # Merge into master output tracking
+            chunk_output_paths.extend(result_dict.keys())
+            chunk_to_original_paths.update(result_dict)
+        else:
+            if not check_all_same_size(filtered_chunk):
+                raise OSError(f"[✗] Images in chunk {i} not same size")
 
-        except Exception as e:
-            print(f"[✗] Chunk {i} error: {e}")
-            continue
-        print("Safely processed chunk: {}".format(i))
+            stitched_img = stitcher.stitch(filtered_chunk)
+            if stitched_img is not None:
+                stitched = crop_connected_region(stitched_img)
+                out_path = os.path.join(tmp_img_chunk_dir, f"chunk_{i}.png")
+                cv.imwrite(out_path, stitched)
+                chunk_output_paths.append(out_path)
+                chunk_to_original_paths[out_path] = filtered_chunk
+                print(f"[✓] Wrote stitched chunk {i} to {out_path}")
+                del stitched_img, stitched
+            else:
+                print(f"[✗] Stitching returned None for chunk {i}")
 
     print("[i] Fusing stitched chunks...")
-    fused_results = fuse_chunks(chunk_output_paths, stitcher, out_dir=out_dir)
+    fused_results = fuse_chunks(chunk_output_paths, stitcher, out_dir=out_dir, provenance_map=chunk_to_original_paths)
 
     # Remap temp input chunks to original input images
     final_output_dict = {}
     for fused_path, used_chunk_paths in fused_results.items():
         all_originals = []
         for chunk_path in used_chunk_paths:
+            #print("stitiching images .... this is chunk_path:",chunk_path)
+            if "downscaled" in chunk_path:
+                dir_ = os.path.dirname(chunk_path)
+                cleaned_filename = os.path.splitext(os.path.basename(chunk_path))[0]
+                ext = chunk_path[-4:]
+                idx = cleaned_filename.index("_downscaled")
+                alt_path_name = cleaned_filename[:idx]
+                #print("trying this filepath: ",os.path.join(dir_,alt_path_name + ext) )
+                chunk_path = os.path.join(dir_,alt_path_name + ext) 
+            if chunk_path not in chunk_to_original_paths:
+                print("WARNING: {} not in chunk to original paths".format(chunk_path))
+                input("Paused.")
             originals = chunk_to_original_paths.get(chunk_path, [])
+            #print("originals:",originals)
             all_originals.extend(originals)
         final_output_dict[fused_path] = all_originals
 
@@ -202,7 +229,7 @@ def main():
         # Find overlapping frames
         print("Looking for overlapping frames ...")
         may_frames = find_frames_inside_ellipse(scaled_cov, center, cam_lon, cam_lat, may_timestamps)
-        print("len(may_frames): {}, len(set(may_frames)):{}".format(len(may_frames),len(set(may_frames))))
+        #print("len(may_frames): {}, len(set(may_frames)):{}".format(len(may_frames),len(set(may_frames))))
         left_frames = find_frames_inside_ellipse(scaled_cov, center, left_cam_lon, left_cam_lat, nov_timestamps)
         right_frames = find_frames_inside_ellipse(scaled_cov, center, right_cam_lon, right_cam_lat, nov_timestamps)
 
@@ -230,22 +257,48 @@ def main():
         os.makedirs(f"{paths['may_results']}/Panos",exist_ok=True) 
         os.makedirs(f"{paths['may_results']}/Panos/"+str(timestamp),exist_ok=True)
         print("Calling stitch images ...")
+        may_paths = [x for x in may_paths if "downscaled" not in x]
         may_pano_dict = stitch_images(may_paths, stitcher,f"{paths['may_results']}/Panos/"+str(timestamp))
-        print("may_pano_dict: ",may_pano_dict)
-        input("Wait") 
-        print()
-
+  
         os.makedirs(f"{paths['nov_results']}/Panos/"+str(timestamp),exist_ok=True) 
+        right_paths = [x for x in right_paths if "downscaled" not in x]
+        left_paths = [x for x in left_paths if "downscaled" not in x]
         nov_pano_dict = stitch_images(left_paths + right_paths, stitcher,f"{paths['nov_results']}/Panos/"+str(timestamp))
-        print("nov_pano_dict: ",nov_pano_dict)
-        input("Wait") 
-        print() 
 
         # Save side-by-side comparison
         os.makedirs(paths["match_output_dir"], exist_ok=True)
         output_path = os.path.join(paths["match_output_dir"], f"fused_{int(timestamp)}.png")
         
+        if len(may_pano_dict) == 0 or len(nov_pano_dict) == 0:
+            print("may_pano_dict: ",may_pano_dict)
+            print()
+            print("nov_pano_dict: ",nov_pano_dict)
+            raise OSError 
+
+        if all_empty_or_none(may_pano_dict):
+            print("all entries in may pano are empty")
+            print("may_pano_dict:",may_pano_dict)
+            raise OSError 
+        
+        if all_empty_or_none(nov_pano_dict):
+            print("all entries in may pano are empty")
+            print("nov_pano_dict:",nov_pano_dict)
+            raise OSError 
+
+        with open("./may_pano_dict.pickle","wb") as f:
+            pickle.dump(may_pano_dict,f) 
+        
+        with open("./nov_pano_dict.pickle","wb") as f:
+            pickle.dump(nov_pano_dict,f) 
+        
+        print("output_path: ",output_path)
+
         plot_stitched_summary_grid(may_pano_dict,nov_pano_dict,output_path)
+        
+        if args.interactive:
+            from seasonal_comparison.interactive_viewer import launch_interactive_viewer
+            fused_dict = {**may_pano_dict, **nov_pano_dict}
+            launch_interactive_viewer(fused_dict, timestamp, may_cov_dir, paths["nov_results"] + "/covariance_matrices")
 
         input("Wait.")
 

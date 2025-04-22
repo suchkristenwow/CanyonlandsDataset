@@ -6,7 +6,6 @@ from matplotlib.patches import Ellipse
 LAT_METERS_PER_DEGREE = 111320
 LON_METERS_PER_DEGREE = 85390
 
-
 def scale_covariance_to_degrees(cov_matrix):
     """Scale covariance matrix from meters² to degrees²."""
     scale = np.diag([1 / LAT_METERS_PER_DEGREE, 1 / LON_METERS_PER_DEGREE])
