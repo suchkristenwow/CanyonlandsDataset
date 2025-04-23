@@ -586,6 +586,29 @@ def fuse_chunks(chunk_paths, stitcher, out_dir=None, provenance_map=None):
 
     return fused_results
 
+def get_unique_sorted_corners(corners, debug_path=None):
+    try:
+        if len(corners) != 4:
+            print(f"[⚠️] Expected 4 corners, got {len(corners)} — {debug_path}")
+            return []
+
+        centroid = MultiPoint(corners).centroid
+        corners.sort(key=lambda pt: np.arctan2(pt[1] - centroid.y, pt[0] - centroid.x))
+
+        unique = []
+        for pt in corners:
+            if not any(np.linalg.norm(np.array(pt) - np.array(other)) < 1e-9 for other in unique):
+                unique.append(pt)
+
+        if len(unique) < 4:
+            print(f"[⚠️] Only {len(unique)} unique corners after sorting — {debug_path}")
+            print(f"  Corners: {corners}")
+            return []
+        return unique
+    except Exception as e:
+        print(f"[✗] Failed to process corners for {debug_path}: {e}")
+        return []
+
 def plot_stitched_summary_grid(fused_dict_may, fused_dict_nov, save_path, figsize=(20, 15)):
     def get_image_size(path):
         img = cv.imread(path)
@@ -593,29 +616,6 @@ def plot_stitched_summary_grid(fused_dict_may, fused_dict_nov, save_path, figsiz
             return 0
         h, w = img.shape[:2]
         return h * w
-
-    def get_unique_sorted_corners(corners, debug_path=None):
-        try:
-            if len(corners) != 4:
-                print(f"[⚠️] Expected 4 corners, got {len(corners)} — {debug_path}")
-                return []
-
-            centroid = MultiPoint(corners).centroid
-            corners.sort(key=lambda pt: np.arctan2(pt[1] - centroid.y, pt[0] - centroid.x))
-
-            unique = []
-            for pt in corners:
-                if not any(np.linalg.norm(np.array(pt) - np.array(other)) < 1e-9 for other in unique):
-                    unique.append(pt)
-
-            if len(unique) < 4:
-                print(f"[⚠️] Only {len(unique)} unique corners after sorting — {debug_path}")
-                print(f"  Corners: {corners}")
-                return []
-            return unique
-        except Exception as e:
-            print(f"[✗] Failed to process corners for {debug_path}: {e}")
-            return []
 
     def safe_gps_lookup(path):
         try:
@@ -685,7 +685,7 @@ def plot_stitched_summary_grid(fused_dict_may, fused_dict_nov, save_path, figsiz
             if len(corners) < 4: 
                 print(corners)
                 raise OSError
-            print("corners:",corners)
+
             valid_corners = debug_corner_distances(corners)
             if valid_corners: 
                 poly = MplPolygon(corners, closed=True, facecolor='red', alpha=0.15, edgecolor='none')
@@ -733,8 +733,8 @@ def gps_lookup(filepath):
     if "Panos" in filepath:
         #result_dir is in processed results already
         result_dir = os.path.dirname(result_dir)
-        print("Result_dir: ",result_dir)
-        print("trying to load in this path:",os.path.join(result_dir,"frustrum_corners.csv"))
+        #print("Result_dir: ",result_dir)
+        #print("trying to load in this path:",os.path.join(result_dir,"frustrum_corners.csv"))
         frustrum_corners = robust_load_csv(os.path.join(result_dir,"frustrum_corners.csv"))
     else: 
         #go up one level, into processed results
@@ -745,7 +745,7 @@ def gps_lookup(filepath):
         underscore_idx = cleaned_filepath.index("_")
         timestamp = int(cleaned_filepath[:underscore_idx]) * 10**(-9)
     else:
-        print("filepath:",filepath)
+        #print("filepath:",filepath)
         timestamp = int(os.path.splitext(os.path.basename(filepath))[0]) * 10**(-9)
 
     if not "Panos" in filepath:
@@ -778,48 +778,7 @@ def gps_lookup(filepath):
         lat_i = frustrum_corners[i*2]
         lon_i = frustrum_corners[i*2 + 1]
         corners.append((lon_i, lat_i))  # correct order: (x, y)
-    """
-    valid,reason = check_corner_uniqueness(corners)
-    if not valid:
-        print("corners:",corners)
-        fig, ax = plt.subplots(figsize=(5, 5))
-        # Order them clockwise
-        try:
-            centroid = MultiPoint(corners).centroid
-            corners.sort(key=lambda point: np.arctan2(point[1] - centroid.y, point[0] - centroid.x))
-        except Exception as e:
-            print(f"[!] Failed to sort corners: {e}")
-
-        # Re-check uniqueness after sorting
-        unique = []
-        for pt in corners:
-            if not any(np.linalg.norm(np.array(pt) - np.array(other)) < 1e-9 for other in unique):
-                unique.append(pt)
-
-        if len(unique) < 4:
-            print(f"[⚠️] Only {len(unique)} unique corners after sorting for {sub_path}")
-            print("Corners:", corners)
-            input("pause to acknowledge")
-
-        # Plot
-        poly = MplPolygon(corners, closed=True, edgecolor='none',
-                        facecolor='blue', alpha=0.15)
-        ax.add_patch(poly)
-
-        all_lons = [x[0] for x in corners]
-        all_lats = [x[1] for x in corners] 
-
-        if all_lons and all_lats:
-            ax.set_xlim(min(all_lons), max(all_lons))
-            ax.set_ylim(min(all_lats), max(all_lats))
-
-        # Save to file
-        output_path = "./polygon_corners_plot.png"
-        plt.savefig(output_path)
-        plt.close()
-
-        raise OSError 
-    """
+   
     if len(corners) < 4:
         raise OSError 
 

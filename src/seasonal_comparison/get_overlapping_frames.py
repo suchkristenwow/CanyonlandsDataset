@@ -14,7 +14,12 @@ from seasonal_comparison.gps_utils import (
     find_closest_frame,
     find_frames_inside_ellipse
 )
-from seasonal_comparison.ellipse_utils import scale_covariance_to_degrees
+from seasonal_comparison.ellipse_utils import (
+    scale_covariance_to_degrees,
+    load_and_average_covariances,
+    get_gps_center,
+    extract_timestamp_ns_from_path
+)
 from seasonal_comparison.image_stitching_utils import (
     make_image_path_dict, 
     chunk_list,
@@ -294,11 +299,6 @@ def main():
         print("output_path: ",output_path)
 
         plot_stitched_summary_grid(may_pano_dict,nov_pano_dict,output_path)
-        
-        if args.interactive:
-            from seasonal_comparison.interactive_viewer import launch_interactive_viewer
-            fused_dict = {**may_pano_dict, **nov_pano_dict}
-            launch_interactive_viewer(fused_dict, timestamp, may_cov_dir, paths["nov_results"] + "/covariance_matrices")
 
         input("Wait.")
 
