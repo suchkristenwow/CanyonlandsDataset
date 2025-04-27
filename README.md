@@ -21,10 +21,6 @@ This repository provides a set of scripts that:
 
 ---
 
-## 📁 Structure
-
----
-
 ## 📁 Dataset Structure
 
 ---
@@ -34,10 +30,10 @@ This repository provides a set of scripts that:
 ### 1. Download the Data
 ### 2. Clone the Repository
 ### 3. Install Dependencies 
-### 4. Example Usage
-
-
-## Example Output
+### 4. Example Usage: ROS 2 Rebagification
+### 4. Example Usage: Multi-Seasonal Comparison
+#### Example Output
 
 
 ## Reference 
+If you've found this dataset or the included tools useful you can cite our paper:
