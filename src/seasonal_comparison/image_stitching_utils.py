@@ -15,6 +15,36 @@ from seasonal_comparison.general_utils import robust_load_csv
 
 MAX_FUSED_IMG_PX = 250*10**(3)
 
+def plot_invalid_polygon(corners, title="Invalid Polygon"):
+    fig, ax = plt.subplots()
+    
+    try:
+        # Try creating it
+        poly = Polygon(corners)
+
+        if not poly.is_empty:
+            x, y = poly.exterior.xy
+            ax.plot(x, y, marker='o', linestyle='-', color='red')
+        else:
+            print("Polygon is empty.")
+        
+        # Also plot points individually
+        for lon, lat in corners:
+            ax.plot(lon, lat, 'bo')  # blue dots for raw points
+
+        ax.set_aspect('equal')
+        ax.set_title(title)
+        plt.xlabel("Longitude")
+        plt.ylabel("Latitude")
+        plt.savefig("./debug_polygon.png")
+        plt.close() 
+        
+    except Exception as e:
+        print(f"Error while plotting: {e}")
+
+def chunk_filenames(filenames, chunk_size=5):
+    return [filenames[i:i + chunk_size] for i in range(0, len(filenames), chunk_size)]
+
 def check_all_same_size(image_paths):
     """
     Returns True if all images have the same (height, width), otherwise False.
@@ -783,3 +813,45 @@ def gps_lookup(filepath):
         raise OSError 
 
     return corners
+
+def find_closest_file(directory, target_ts_sec, tolerance_sec=0.1):
+    """
+    Find the closest .png file in the directory based on the target timestamp (seconds),
+    where filenames are nanosecond timestamps. Only return if within tolerance (seconds).
+    
+    Args:
+        directory (str): Path to the directory containing .png files.
+        target_ts_sec (float): Target timestamp in seconds.
+        tolerance_sec (float): Acceptable time difference in seconds.
+
+    Returns:
+        str or None: Full path to the closest matching file, or None if no match.
+    """
+    files = [f for f in os.listdir(directory) if f.endswith('.png')]
+
+    if not files:
+        return None
+
+    # Parse timestamps from filenames (remove .png, convert to seconds)
+    ts_file_list = []
+    for f in files:
+        fname_no_ext = os.path.splitext(f)[0]
+        try:
+            ts_ns = int(fname_no_ext)
+            ts_sec = ts_ns * 1e-9
+            ts_file_list.append((ts_sec, f))
+        except ValueError:
+            continue  # skip files that don't have numeric names
+
+    if not ts_file_list:
+        return None
+
+    # Find the file with minimum time difference
+    closest = min(ts_file_list, key=lambda x: abs(x[0] - target_ts_sec))
+    closest_diff = abs(closest[0] - target_ts_sec)
+
+    if closest_diff <= tolerance_sec:
+        return os.path.join(directory, closest[1])
+    else:
+        print("Could not find a filename within the desired threshold!")
+        return None

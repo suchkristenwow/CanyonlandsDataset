@@ -5,9 +5,29 @@ import glob
 from geopy.distance import geodesic
 from collections import defaultdict, deque
 from seasonal_comparison.general_utils import robust_load_csv
-from shapely.geometry import MultiPoint 
+from shapely.geometry import MultiPoint, Polygon
 from matplotlib.patches import Polygon as MplPolygon 
 import matplotlib.pyplot as plt 
+import networkx as nx
+
+def find_largest_overlap_subset(mpl_polygons):
+    # Step 1: Convert MplPolygon to Shapely Polygon
+    shapely_polygons = [Polygon(polygon.get_xy()) for polygon in mpl_polygons]
+
+    # Step 2: Build the graph
+    G = nx.Graph()
+    G.add_nodes_from(range(len(shapely_polygons)))
+
+    for i in range(len(shapely_polygons)):
+        for j in range(i + 1, len(shapely_polygons)):
+            if shapely_polygons[i].intersects(shapely_polygons[j]):
+                G.add_edge(i, j)
+
+    # Step 3: Find the largest connected component
+    largest_cc = max(nx.connected_components(G), key=len)
+
+    # Step 4: Return the corresponding polygons
+    return [mpl_polygons[i] for i in largest_cc]
 
 def debug_corner_distances(corners, tol=0.2):
     """
