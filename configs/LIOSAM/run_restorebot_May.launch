@@ -1,0 +1,29 @@
+<launch>
+
+    <arg name="project" default="lio_sam"/>
+    <arg name="vehicle_name" default="H03" />
+
+    <!-- Parameters -->
+    <rosparam file="$(find lio_sam)/config/restorebot_params.yaml" command="load" />
+
+    <!-- Set Robot Description -->
+    <param name="robot_description" command="$(find xacro)/xacro '$(find lio_sam)/config/May.urdf.xacro' use_nominal_extrinsics:=true" />
+
+    <!-- Robot State Publisher -->
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher_node">
+        <remap from="robot_description" to="robot_description"/>
+    </node>
+
+    <!--- LOAM -->
+    <include file="$(find lio_sam)/launch/include/module_loam.launch" />
+
+    <!--- Robot State TF -->
+    <include file="$(find lio_sam)/launch/include/module_restorebot_state_publisher_May.launch" />
+
+    <!--- Run Navsat -->
+    <include file="$(find lio_sam)/launch/include/module_navsat.launch" />
+
+    <!--- Run Rviz-->
+    <include file="$(find lio_sam)/launch/include/module_rviz.launch" />
+
+</launch>

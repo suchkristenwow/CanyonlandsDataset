@@ -1,0 +1,4 @@
+[paths]
+workspace_path = "/home/kristen/catkin_ws"
+season_dir = "/ex_path/RestorebotData/May2022_final"
+bag_dir = "/ex_path/RestorebotData/bags"

@@ -1,0 +1,358 @@
+<?xml version="1.0"?>
+<robot name="H03" xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:arg name="name" default="H03"/>
+  <xacro:property name="robot_namespace" value="$(arg name)"/>
+  <link name='base_link'>
+    <!-- <inertial>
+      <origin xyz='-0.000543 -0.084945 0.062329' rpy='0 -0 0'/>
+      <mass value='46.064'/>
+      <inertia ixx='0.615397' ixy='-0.0240585' ixz='-0.120749' iyy='1.75388' iyz='-0.0028322' izz='2.03641'/>
+    </inertial> -->
+    <collision name='base_link_collision'>
+      <origin xyz='0 0 0.12' rpy='0 -0 0'/>
+      <geometry>
+        <box size='0.9874 0.5709 0.05'/>
+      </geometry>
+    </collision>
+    <collision name='base_link_collision_bottom'>
+      <origin xyz='0 0 0.046' rpy='0 -0 0'/>
+      <geometry>
+        <box size='0.8 0.5709 0.095'/>
+      </geometry>
+    </collision>
+    <collision name='base_link_collision_1'>
+      <origin xyz='0 0 0.185625' rpy='0 -0 0'/>
+      <geometry>
+        <box size='0.78992 0.5709 0.12375'/>
+      </geometry>
+    </collision>
+    <collision name='base_link_fixed_joint_lump__velodyne_base_link_collision_6'>
+      <origin xyz='0.424 0 0.327' rpy='0 -0 0'/>
+      <geometry>
+        <cylinder radius='0.0516' length='0.0717'/>
+      </geometry>
+    </collision>
+    <collision name='base_link_fixed_joint_lump__sensor_tower_8'>
+      <origin xyz='0.374 0 0.215' rpy='0 -0 0'/>
+      <geometry>
+        <box size='0.2 0.25 0.225'/>
+      </geometry>
+    </collision>
+    <collision name='base_link_fixed_joint_lump__computer_block_9'>
+      <origin xyz='0.05 0 0.185' rpy='0 -0 0'/>
+      <geometry>
+        <box size='0.3 0.355 0.175'/>
+      </geometry>
+    </collision>
+    <visual name='base_link_visual'>
+      <origin xyz='0 0 0' rpy='0 -0 0'/>
+      <geometry>
+        <mesh filename='package://marble_common/meshes/base_link.dae' scale='1 1 1'/>
+      </geometry>
+    </visual>
+    <visual name='base_link_fixed_joint_lump__front_bumper_link_visual_3'>
+      <origin xyz='0.48 0 0.091' rpy='0 -0 0'/>
+      <geometry>
+        <mesh filename='package://marble_common/meshes/bumper.dae' scale='1 1 1'/>
+      </geometry>
+    </visual>
+    <visual name='base_link_fixed_joint_lump__rear_bumper_link_visual_4'>
+      <origin xyz='-0.48 0 0.091' rpy='0 -0 3.14159'/>
+      <geometry>
+        <mesh filename='package://marble_common/meshes/bumper.dae' scale='1 1 1'/>
+      </geometry>
+    </visual>
+    <visual name='base_link_fixed_joint_lump__top_chassis_link_visual_5'>
+      <origin xyz='0 0 0' rpy='0 -0 0'/>
+      <geometry>
+        <mesh filename='package://marble_common/meshes/top_chassis.dae' scale='1 1 1'/>
+      </geometry>
+    </visual>
+    <visual name='base_link_fixed_joint_lump__velodyne_base_link_visual_10'>
+      <origin xyz='0.424 0 0.327' rpy='0 -0 0'/>
+      <geometry>
+        <mesh filename='package://marble_common/meshes/VLP16_base_1.dae' scale='1 1 1'/>
+      </geometry>
+    </visual>
+    <visual name='base_link_fixed_joint_lump__velodyne_base_link_visual_11'>
+      <origin xyz='0.424 0 0.327' rpy='0 -0 0'/>
+      <geometry>
+        <mesh filename='package://marble_common/meshes/VLP16_base_2.dae' scale='1 1 1'/>
+      </geometry>
+    </visual>
+    <visual name='base_link_fixed_joint_lump__velodyne_visual_12'>
+      <origin xyz='0.424 0 0.327' rpy='0 -0 0'/>
+      <geometry>
+        <mesh filename='package://marble_common/meshes/VLP16_scan.dae' scale='1 1 1'/>
+      </geometry>
+    </visual>
+    <visual name='base_link_fixed_joint_lump__user_rail_link_visual_13'>
+      <origin xyz='0.272 0 0.245' rpy='0 -0 0'/>
+      <geometry>
+        <mesh filename='package://marble_common/meshes/user_rail.dae' scale='1 1 1'/>
+      </geometry>
+    </visual>
+    <visual name='base_link_fixed_joint_lump__planar_lidar_link_visual_14'>
+      <origin xyz='0.474 0 0.127' rpy='0 -0 0'/>
+      <geometry>
+        <cylinder radius='0.045' length='0.05'/>
+      </geometry>
+    </visual>
+    <visual name='base_link_fixed_joint_lump__sensor_tower_16'>
+      <origin xyz='0.374 0 0.215' rpy='0 -0 0'/>
+      <geometry>
+        <box size='0.2 0.25 0.225'/>
+      </geometry>
+    </visual>
+    <visual name='base_link_fixed_joint_lump__computer_block_17'>
+      <origin xyz='0.05 0 0.185' rpy='0 -0 0'/>
+      <geometry>
+        <box size='0.3 0.355 0.175'/>
+      </geometry>
+    </visual>
+  </link>
+
+  <link name="${robot_namespace}/imu_viz_link"/>
+  <joint name="imu-viz-joint" type="fixed">
+    <parent link="${robot_namespace}/imu_viz_link"/>
+    <child link="${robot_namespace}/imu_link"/>
+    <!-- <origin xyz="0.00355 0.07566 0.03168" rpy="3.1415926535 0.0 -1.57079632679" /> custom machined plate, ouster out front -->
+    <origin xyz="0 0 0" rpy="3.1415926535 0.0 -1.57079632679"/> <!-- precision machined plate, ouster out back, no heat sink -->
+  </joint>
+
+  <link name="${robot_namespace}/imu_link"/>
+  <joint name="imu-joint" type="fixed">
+    <parent link="${robot_namespace}/imu_viz_link"/>
+    <child link="base_link"/>
+    <origin xyz="-0.4379 0 -.52418" rpy="0.0 0.0 0.0" />
+  </joint>
+
+  <link name="${robot_namespace}/planning_link"/>
+  <joint name="planning-joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="${robot_namespace}/planning_link"/>
+    <origin xyz="0.0 0.0 0.62" rpy="0.0 0.0 0.0" />
+  </joint>
+
+  <link name="${robot_namespace}/horiz_ouster_sensor"/>
+  <joint name="horiz-ouster-joint" type="fixed">
+    <parent link="${robot_namespace}/imu_viz_link"/>
+    <child link="${robot_namespace}/horiz_ouster_sensor"/>
+    <origin xyz="-0.07516 -0.0033 0.0315" rpy="0 0 0"/> <!-- precision machined plate, ouster out back, no heat sink --> <!-- z = 0.02268 for old firmware -->
+  </joint>
+
+  <link name="${robot_namespace}/vert_ouster_sensor"/>
+  <joint name="vert-ouster-joint" type="fixed">
+    <parent link="${robot_namespace}/imu_viz_link"/>
+    <child link="${robot_namespace}/vert_ouster_sensor"/>
+    <!--<origin xyz="-0.1275 0 -0.076" rpy="-1.57079632679 0.0 -1.57079632679" />-->
+    <origin xyz="-0.192 0.0037 -0.1365" rpy="1.57079632679 0.0 -1.57079632679" />
+  </joint>
+
+  <link name="${robot_namespace}/cam_front_link"/>
+  <joint name="cam-front-joint" type="fixed">
+    <parent link="${robot_namespace}/imu_viz_link"/>
+    <child link="${robot_namespace}/cam_front_link"/>
+    <origin xyz="0.152758 0.00 0.0324" rpy="0 0 0" />
+  </joint>
+
+  <link name="${robot_namespace}/cam_left_link"/>
+  <joint name="cam-left-joint" type="fixed">
+    <parent link="${robot_namespace}/imu_viz_link"/>
+    <child link="${robot_namespace}/cam_left_link"/>
+    <origin xyz="0.00 0.158248 0.0324" rpy="0 0 1.5708" />
+  </joint>
+
+  <link name="${robot_namespace}/cam_right_link"/>
+  <joint name="cam-right-joint" type="fixed">
+    <parent link="${robot_namespace}/imu_viz_link"/>
+    <child link="${robot_namespace}/cam_right_link"/>
+    <origin xyz="0.00 -0.158258 0.0324" rpy="0 0 -1.5708" />
+  </joint>
+
+  <link name="${robot_namespace}/cam_back_link"/>
+  <joint name="cam-back-joint" type="fixed">
+    <parent link="${robot_namespace}/imu_viz_link"/>
+    <child link="${robot_namespace}/cam_back_link"/>
+    <origin xyz="-0.1294205 0.00 0.0289" rpy="0 0 -3.14159" />
+  </joint>
+
+  <link name="${robot_namespace}/picoflexx_mount_link"/>
+  <joint name='picoflexx_mount_joint' type='fixed'>
+    <origin xyz='0.02 0.0 -0.075' rpy='0 0.5236 0'/>
+    <parent link='${robot_namespace}/imu_viz_link'/>
+    <child link='${robot_namespace}/picoflexx_mount_link'/>
+  </joint>
+
+  <link name="${robot_namespace}/pico_flexx_left_optical_frame"/>
+  <joint name='picoflexx_left_joint' type='fixed'>
+    <origin xyz='0.0 0.0 0.0' rpy='0.0 1.5707 0.41'/>
+    <parent link='${robot_namespace}/picoflexx_mount_link'/>
+    <child link='${robot_namespace}/pico_flexx_left_optical_frame'/>
+  </joint>
+
+  <link name="${robot_namespace}/pico_flexx_right_optical_frame"/>
+  <joint name='picoflexx_right_joint' type='fixed'>
+    <origin xyz='0.0 0.0 0.0' rpy='0.0 1.5707 -0.41'/>
+    <parent link='${robot_namespace}/picoflexx_mount_link'/>
+    <child link='${robot_namespace}/pico_flexx_right_optical_frame'/>
+  </joint>
+
+  <link name="laser"/>
+  <joint name="rplidar-joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="laser"/>
+    <origin xyz="0.48 0 0.0" rpy="0.0 0.0 3.1415" />
+  </joint>
+
+  <link name="${robot_namespace}/rplidar_safety_link"/>
+  <joint name="base-link-rplidar-joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="${robot_namespace}/rplidar_safety_link"/>
+    <origin xyz="0.48 0 0.0" rpy="0.0 3.1415 1.5707" />
+  </joint>
+
+  <link name='${robot_namespace}/front_left_wheel_link'>
+    <inertial>
+      <origin xyz='0 0 0' rpy='0 -0 0'/>
+      <mass value='2.637'/>
+      <inertia ixx='0.02467' ixy='0' ixz='0' iyy='0.04411' iyz='0' izz='0.02467'/>
+    </inertial>
+    <collision name='front_left_wheel_link_collision'>
+      <origin xyz='0 0 0' rpy='1.5708 -0 0'/>
+      <geometry>
+        <cylinder radius='0.1651' length='0.1143'/>
+      </geometry>
+    </collision>
+    <visual name='front_left_wheel_link_visual'>
+      <origin xyz='0 0 0' rpy='0 -0 0'/>
+      <geometry>
+        <mesh filename='package://marble_common/meshes/wheel.dae' scale='1 1 1'/>
+      </geometry>
+    </visual>
+  </link>
+  <link name='${robot_namespace}/front_right_wheel_link'>
+    <inertial>
+      <origin xyz='0 0 0' rpy='0 -0 0'/>
+      <mass value='2.637'/>
+      <inertia ixx='0.02467' ixy='0' ixz='0' iyy='0.04411' iyz='0' izz='0.02467'/>
+    </inertial>
+    <collision name='front_right_wheel_link_collision'>
+      <origin xyz='0 0 0' rpy='1.5708 -0 0'/>
+      <geometry>
+        <cylinder radius='0.1651' length='0.1143'/>
+      </geometry>
+    </collision>
+    <visual name='front_right_wheel_link_visual'>
+      <origin xyz='0 0 0' rpy='0 -0 0'/>
+      <geometry>
+        <mesh filename='package://marble_common/meshes/wheel.dae' scale='1 1 1'/>
+      </geometry>
+    </visual>
+  </link>
+  <link name='${robot_namespace}/rear_left_wheel_link'>
+    <inertial>
+      <origin xyz='0 0 0' rpy='0 -0 0'/>
+      <mass value='2.637'/>
+      <inertia ixx='0.02467' ixy='0' ixz='0' iyy='0.04411' iyz='0' izz='0.02467'/>
+    </inertial>
+    <collision name='rear_left_wheel_link_collision'>
+      <origin xyz='0 0 0' rpy='1.5708 -0 0'/>
+      <geometry>
+        <cylinder radius='0.1651' length='0.1143'/>
+      </geometry>
+    </collision>
+    <visual name='rear_left_wheel_link_visual'>
+      <origin xyz='0 0 0' rpy='0 -0 0'/>
+      <geometry>
+        <mesh filename='package://marble_common/meshes/wheel.dae' scale='1 1 1'/>
+      </geometry>
+    </visual>
+  </link>
+  <link name='${robot_namespace}/rear_right_wheel_link'>
+    <inertial>
+      <origin xyz='0 0 0' rpy='0 -0 0'/>
+      <mass value='2.637'/>
+      <inertia ixx='0.02467' ixy='0' ixz='0' iyy='0.04411' iyz='0' izz='0.02467'/>
+    </inertial>
+    <collision name='rear_right_wheel_link_collision'>
+      <origin xyz='0 0 0' rpy='1.5708 -0 0'/>
+      <geometry>
+        <cylinder radius='0.1651' length='0.1143'/>
+      </geometry>
+    </collision>
+    <visual name='rear_right_wheel_link_visual'>
+      <origin xyz='0 0 0' rpy='0 -0 0'/>
+      <geometry>
+        <mesh filename='package://marble_common/meshes/wheel.dae' scale='1 1 1'/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="${robot_namespace}/front_left_wheel_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="${robot_namespace}/front_left_wheel_link"/>
+    <origin xyz='0.256 0.2854 0.03282' rpy='0 -0 0'/>
+  </joint>
+
+  <joint name="${robot_namespace}/front_right_wheel_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="${robot_namespace}/front_right_wheel_link"/>
+    <origin xyz='0.256 -0.2854 0.03282' rpy='0 -0 0'/>
+  </joint>
+
+  <joint name="${robot_namespace}/rear_left_wheel_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="${robot_namespace}/rear_left_wheel_link"/>
+    <origin xyz='-0.256 0.2854 0.03282' rpy='0 -0 0'/>
+  </joint>
+
+  <joint name="${robot_namespace}/rear_right_wheel_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="${robot_namespace}/rear_right_wheel_link"/>
+    <origin xyz='-0.256 -0.2854 0.03282' rpy='0 -0 0'/>
+  </joint>
+
+  <link name="navsat_link"/>
+  <joint name="navsat-joint" type="fixed">
+    <parent link="${robot_namespace}/horiz_ouster_sensor"/>
+    <child link="navsat_link"/>
+    <origin xyz="-0.663575 0.19167 -0.14155" rpy="0 0 0" /> 
+  </joint>
+
+  <link name="down_camera_color_optical_frame"/>
+  <joint name="down_cam-joint" type="fixed">
+    <parent link="${robot_namespace}/horiz_ouster_sensor"/>
+    <child link="down_camera_color_optical_frame"/>
+    <origin xyz="0.03962 0.0 -0.57843" rpy="0 1.5708 0" />
+  </joint> 
+
+  <link name="bottomRight_frame_corner"/>
+  <joint name="bottomRight_frame-joint" type="fixed">
+    <parent link="${robot_namespace}/horiz_ouster_sensor"/>
+    <child link="bottomRight_frame_corner"/>
+    <origin xyz="-0.0045 -0.06225 -0.691" rpy="0 0 0" />
+  </joint>  
+
+  <link name="bottomLeft_frame_corner"/>
+  <joint name="bottomLeft_frame-joint" type="fixed">
+    <parent link="${robot_namespace}/horiz_ouster_sensor"/>
+    <child link="bottomLeft_frame_corner"/>
+    <origin xyz="-0.0045 0.06 -0.691" rpy="0 0 0" />
+  </joint>  
+
+  <link name="topLeft_frame_corner"/>
+  <joint name="topLeft_frame-joint" type="fixed">
+    <parent link="${robot_namespace}/horiz_ouster_sensor"/>
+    <child link="topLeft_frame_corner"/>
+    <origin xyz="0.0835 -0.06225 -0.691" rpy="0 0 0" />
+  </joint>  
+
+  <link name="topRight_frame_corner"/>
+  <joint name="topRight_frame-joint" type="fixed">
+    <parent link="${robot_namespace}/horiz_ouster_sensor"/>
+    <child link="topRight_frame_corner"/>
+    <origin xyz="0.0835 0.06 -0.691" rpy="0 0 0" />
+  </joint>  
+
+</robot>
