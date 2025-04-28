@@ -37,6 +37,7 @@ def main(plot_name, season, config_path):
     workspace_path = config["paths"]["workspace_path"]
     bag_dir = config["paths"]["bag_dir"]
     season_dir = config["paths"]["season_dir_Nov"]  # Assume you add this path for November
+    annotation_dir = config["paths"]["annotation_dir"]
 
     results_dir = f"{season}_results/{plot_name}"
     os.makedirs(results_dir, exist_ok=True)
@@ -93,7 +94,8 @@ def main(plot_name, season, config_path):
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
     # Step 6: Run automate_annotations.py
-    auto_annotate_cmd = f"python3 {os.path.join(script_dir, 'automate_annotations.py')} --season Nov --plot_name {plot_name}"
+    annotation_path = os.path.join(annotation_path,f"{plot_name}_compass_annotations_Nov.csv")
+    auto_annotate_cmd = f"python3 {os.path.join(script_dir, 'automate_annotations.py')} --season Nov --annotation_path {annotation_path} --results_path{results_dir}"
     subprocess.check_call(auto_annotate_cmd, shell=True, executable="/bin/bash")
 
     data_csv = os.path.join(results_dir, "data.csv")
@@ -101,7 +103,7 @@ def main(plot_name, season, config_path):
         raise RuntimeError("❌ data.csv has no data after automate_annotations.py")
 
     # Step 7: Run interpolate_compassHeading.py
-    interp_cmd = f"python3 {os.path.join(script_dir, 'interpolate_compassHeading.py')} --season Nov --plot_name {plot_name}"
+    interp_cmd = f"python3 {os.path.join(script_dir, 'interpolate_compassHeading.py')} --season Nov --plot_name {plot_name} --annotation_path{annotation_path} --results_path{results_dir}"
     subprocess.check_call(source_cmd + interp_cmd, shell=True, executable="/bin/bash")
 
     proc_heading = os.path.join(results_dir, "processed_compass_heading.csv")

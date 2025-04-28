@@ -158,15 +158,10 @@ def robust_load_csv(path, min_cols=4, skip_header=1):
     raise ValueError(f"❌ Failed to load usable data from {path} with common delimiters.")
 
 # === Main Script ===
-def main(season, plot_name):
-    base_path = f"{season}_results/{plot_name}"
+def main(season, plot_name, base_path, manual_annots_path):
     os.makedirs(base_path, exist_ok=True)
 
     auto_annots = np.genfromtxt(os.path.join(base_path, "data.csv"), delimiter=",")
-    if season == "Nov":
-        manual_annots_path = f"/home/kristen/Documents/RestorebotAnnotations/{plot_name}_compass_annotations_{season}.csv"
-    else: 
-        manual_annots_path = f"/home/kristen/Documents/RestorebotAnnotations/{plot_name}_compass_annotations.csv"
 
     manual_annots = robust_load_csv(manual_annots_path) 
 
@@ -213,5 +208,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process compass heading data with error smoothing.")
     parser.add_argument("--season", required=True, help="Season (e.g. Nov, May)")
     parser.add_argument("--plot_name", required=True, help="Plot name (e.g. 1conmod)")
+    parser.add_argument("--annotation_path", required=True)
+    parser.add_argument("--results_path")
+
     args = parser.parse_args()
-    main(args.season, args.plot_name)
+    main(args.season, args.plot_name, args.results_path, args.annotation_path)

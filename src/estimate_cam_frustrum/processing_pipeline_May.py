@@ -93,7 +93,7 @@ def main(plot_name, config_path):
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
     # Step 6: Run automate_annotations.py
-    auto_annotate_cmd = f"python3 {os.path.join(script_dir, 'automate_annotations.py')} --season May --plot_name {plot_name}"
+    auto_annotate_cmd = f"python3 {os.path.join(script_dir, 'automate_annotations.py')} --season May --annotation_path {annotation_path} --results_path {results_dir}"
     subprocess.check_call(auto_annotate_cmd, shell=True, executable="/bin/bash")
 
     data_csv = os.path.join(results_dir, "data.csv")
@@ -101,7 +101,7 @@ def main(plot_name, config_path):
         raise RuntimeError("❌ data.csv has no data after automate_annotations.py")
 
     # Step 7: Run interpolate_compassHeading.py
-    interp_cmd = f"python3 {os.path.join(script_dir, 'interpolate_compassHeading.py')} --season May --plot_name {plot_name}"
+    interp_cmd = f"python3 {os.path.join(script_dir, 'interpolate_compassHeading.py')} --season May --plot_name {plot_name} --annotation_path {annotation_path} --results_path {results_dir}"
     subprocess.check_call(source_cmd + interp_cmd, shell=True, executable="/bin/bash")
 
     proc_heading = os.path.join(results_dir, "processed_compass_heading.csv")

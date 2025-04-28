@@ -9,14 +9,9 @@ def get_range_index(ranges, value):
             return i
     return None
 
-def main(season, plot_name):
-    if season == "May":
-        annotation_path = f"/home/kristen/Documents/RestorebotAnnotations/{plot_name}_compass_annotations.csv"
-    else: 
-        annotation_path = f"/home/kristen/Documents/RestorebotAnnotations/{plot_name}_compass_annotations_{season}.csv"
-
-    raw_data_path = f"{season}_results/{plot_name}/yawHeading_data.csv"
-    save_path = f"{season}_results/{plot_name}/data.csv"
+def main(season, annotation_path, results_path):
+    raw_data_path = os.path.join(results_path,f"{season}_results/{plot_name}/yawHeading_data.csv") 
+    save_path = os.path.join(results_path,f"{season}_results/{plot_name}/data.csv") 
 
     hand_annotations = robust_load_csv(annotation_path) 
     print("hand_annotations:", hand_annotations)
@@ -66,7 +61,8 @@ def main(season, plot_name):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Filter and save valid compass heading data based on annotations.")
     parser.add_argument("--season", required=True, help="Season name (e.g., 'Nov', 'May')")
-    parser.add_argument("--plot_name", required=True, help="Plot name (e.g., '1conmod')")
+    parser.add_argument("--annotation_path", required=True)
+    parser.add_argument("--results_path")
 
     args = parser.parse_args()
-    main(args.season, args.plot_name)
+    main(args.season, args.annotation_path, args.results_path)
