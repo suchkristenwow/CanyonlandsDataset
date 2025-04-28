@@ -56,5 +56,5 @@ Set the desired paths and stitching parameters inside configs/your_config.toml, 
 This script iterates over each frame in May and searches for overlapping frames from the same plot in November whose centroid falls within the covariance associated with that timestamp. These frames are then temporarily chunked (to manage image size and memory usage) and stitched.In the center the frustrum of these frames is plotted in GPS coordinates. The paths to the constituent images are mapped to each stitched image and pickled. 
 
 #### Example Output
-<p align="center"> <img src="imgs/20221108_100625.jpg" width="600"/> </p> 
+<p align="center"> <img src="imgs/comparison_plot21.png" width="600"/> </p> 
 
