@@ -1,17 +1,20 @@
-from shapely.ops import unary_union
-from matplotlib.patches import Polygon as MplPolygon
-from shapely.geometry import Polygon, MultiPolygon, MultiPoint
-import matplotlib.patches as mpatches
-import matplotlib.gridspec as gridspec
-import matplotlib.pyplot as plt
-import numpy as np 
-import cv2 as cv
-import os 
-from geopy.distance import geodesic
-import geopy
-from geographiclib.geodesic import Geodesic
-from seasonal_comparison.image_stitching_utils import check_corner_uniqueness
+#!/usr/bin/env python3
 
+import os
+
+import numpy as np
+import cv2 as cv
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+import matplotlib.patches as mpatches
+from matplotlib.patches import Polygon as MplPolygon
+
+from shapely.geometry import MultiPoint
+from shapely.ops import unary_union
+
+from geographiclib.geodesic import Geodesic
+
+from seasonal_comparison.image_stitching_utils import check_corner_uniqueness
 
 def find_largest_overlap_subset(polygons):
     """
@@ -242,17 +245,22 @@ def make_comparison_fig(may_data,nov_data,may_polygon_list,nov_polygon_list,fuse
     ax1.set_title("Down-Facing Camera Frames", fontsize=10)
 
     # Add legend
+    '''
     may_outline = mpatches.Patch(facecolor='none', edgecolor='blue', label='May Frames')
     nov_left_outline = mpatches.Patch(facecolor='none', edgecolor='red', label='Nov Frames (Left)')
     nov_right_outline = mpatches.Patch(facecolor='none', edgecolor='orange', label='Nov Frames (Right)')
+    '''
     may_fused = mpatches.Patch(facecolor='blue', alpha=0.25, label='May Fused Area')
     nov_fused = mpatches.Patch(facecolor=poly_color, alpha=0.25, label='Nov Fused Area')
 
     ax1.legend(
-        handles=[may_outline, nov_left_outline, nov_right_outline, may_fused, nov_fused],
-        loc='center left',
-        bbox_to_anchor=(-0.1, 1.75),
-        fontsize=8
+        #may_outline, nov_left_outline, nov_right_outline, 
+        handles=[may_fused, nov_fused],
+        loc='lower center',
+        bbox_to_anchor=(0.5, 1.22),
+        ncol=2,
+        fontsize=8,
+        frameon=False
     )
 
     # ----- Right: November fused image -----
@@ -263,11 +271,10 @@ def make_comparison_fig(may_data,nov_data,may_polygon_list,nov_polygon_list,fuse
     ax2.axis('off')
     ax2.set_title(f"November Fused Image\n{os.path.basename(nov_img_path)}", fontsize=10)
 
-    plt.tight_layout()
-    print(f"Writing {output_path}")
+    plt.tight_layout(rect=[0, 0, 1, 0.95])  
+    #print(f"Writing {output_path}")
     plt.savefig(output_path)
     plt.close() 
-
 
 def make_gps_plot(may_data,nov_data,may_polygon_list,nov_polygon_list,nov_img_path,output_path):
     fig, ax = plt.subplots()
@@ -343,6 +350,6 @@ def make_gps_plot(may_data,nov_data,may_polygon_list,nov_polygon_list,nov_img_pa
     # Set aspect ratio to equal (important for GPS maps!)
     ax.set_aspect('equal', adjustable='box')
 
-    print(f"Wrote {output_path}")
+    #print(f"Wrote {output_path}")
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     plt.close()

@@ -1,20 +1,48 @@
-from geopy.distance import geodesic
-import os 
-import numpy as np 
-import glob  
-from geopy.distance import geodesic
-from collections import defaultdict, deque
+#!/usr/bin/env python3
+
+"""
+Utilities for working with GPS covariance ellipses, 
+finding overlapping frames, and loading covariance data.
+"""
+
+import os
+import glob
+import numpy as np
+
+from shapely.geometry import Polygon
+
 from seasonal_comparison.general_utils import robust_load_csv
-from shapely.geometry import MultiPoint, Polygon
-from matplotlib.patches import Polygon as MplPolygon 
-import matplotlib.pyplot as plt 
-import networkx as nx
+
+# Constants for meter-to-degree scaling
+LAT_METERS_PER_DEGREE = 111_320
+LON_METERS_PER_DEGREE = 85_390
+
+def scale_covariance_to_degrees(cov_matrix):
+    """
+    Scale a 2x2 covariance matrix from meters² to degrees².
+
+    Args:
+        cov_matrix (np.ndarray): Covariance matrix in meters.
+
+    Returns:
+        np.ndarray: Covariance matrix scaled to degrees.
+    """
+    scale = np.diag([1 / LAT_METERS_PER_DEGREE, 1 / LON_METERS_PER_DEGREE])
+    return scale @ cov_matrix @ scale.T
+
 
 def find_largest_overlap_subset(mpl_polygons):
-    # Step 1: Convert MplPolygon to Shapely Polygon
+    """
+    Find the largest subset of polygons where all overlap.
+
+    Args:
+        mpl_polygons (list of MplPolygon): List of Matplotlib polygons.
+
+    Returns:
+        list of MplPolygon: Largest subset of overlapping polygons.
+    """
     shapely_polygons = [Polygon(polygon.get_xy()) for polygon in mpl_polygons]
 
-    # Step 2: Build the graph
     G = nx.Graph()
     G.add_nodes_from(range(len(shapely_polygons)))
 
@@ -23,202 +51,73 @@ def find_largest_overlap_subset(mpl_polygons):
             if shapely_polygons[i].intersects(shapely_polygons[j]):
                 G.add_edge(i, j)
 
-    # Step 3: Find the largest connected component
-    largest_cc = max(nx.connected_components(G), key=len)
-
-    # Step 4: Return the corresponding polygons
+    largest_cc = max(nx.connected_components(G), key=len, default=[])
     return [mpl_polygons[i] for i in largest_cc]
 
-def debug_corner_distances(corners, tol=0.2):
-    """
-    corners: list of (lon, lat) tuples
-    tol: fractional tolerance for grouping distances (e.g., 0.5 = 50%)
-    
-    Returns a dict grouping distances and prints a warning if > 2 unique groups
-    """
-    if len(corners) != 4:
-        print(f"[⚠️] Expected 4 corners but got {len(corners)}")
-        return {}
-
-    centroid = MultiPoint(corners).centroid
-    centroid_latlon = (centroid.y, centroid.x)
-
-    dists = []
-    for i, (lon, lat) in enumerate(corners):
-        d = geodesic(centroid_latlon, (lat, lon)).meters
-        dists.append((i, d))
-
-    # Group by distance buckets (with tolerance)
-    grouped = []
-    for i, d in dists:
-        placed = False
-        for group in grouped:
-            if abs(d - group[0][1]) / group[0][1] < tol:
-                group.append((i, d))
-                placed = True
-                break
-        if not placed:
-            grouped.append([(i, d)])
-
-    if len(grouped) > 2:
-        return False 
-        """
-        print(f"[❌] Corner distance inconsistency: {len(grouped)} unique distance groups")
-        for group in grouped:
-            print("  Group:", [f"idx {i} = {round(dist,1)} m" for i, dist in group])
-        print("  Corners (lon, lat):", corners)
-        
-        fig, ax = plt.subplots(figsize=(5, 5))
-        # Order them clockwise
-        try:
-            centroid = MultiPoint(corners).centroid
-            corners.sort(key=lambda point: np.arctan2(point[1] - centroid.y, point[0] - centroid.x))
-        except Exception as e:
-            print(f"[!] Failed to sort corners: {e}")
-
-        # Re-check uniqueness after sorting
-        unique = []
-        for pt in corners:
-            if not any(np.linalg.norm(np.array(pt) - np.array(other)) < 1e-9 for other in unique):
-                unique.append(pt)
-
-        if len(unique) < 4:
-            print(f"[⚠️] Only {len(unique)} unique corners after sorting for {sub_path}")
-            print("Corners:", corners)
-            input("pause to acknowledge")
-
-        # Plot
-        poly = MplPolygon(corners, closed=True, edgecolor='none',
-                        facecolor='blue', alpha=0.15)
-        ax.add_patch(poly)
-
-        for corner in corners:
-            ax.scatter(corner[0],corner[1],color='red')
-
-        all_lons = [x[0] for x in corners]
-        all_lats = [x[1] for x in corners] 
-
-        if all_lons and all_lats:
-            ax.set_xlim(min(all_lons), max(all_lons))
-            ax.set_ylim(min(all_lats), max(all_lats))
-
-        # Save to file
-        output_path = "./polygon_corners_plot.png"
-        plt.savefig(output_path)
-        plt.close()
-        """ 
-
-    return True 
-
-def is_inside_ellipse(cov_matrix, center, point, threshold=1.0):
-    delta = np.array(point) - np.array(center)
-    return delta.T @ np.linalg.inv(cov_matrix) @ delta <= threshold
 
 def find_frames_inside_ellipse(cov_matrix, center, longitudes, latitudes, timestamps, threshold=1.0):
     """
-    Vectorized check for which points fall inside the covariance ellipse.
-    """
-    # Stack coordinates: shape (N, 2)
-    points = np.column_stack((longitudes, latitudes))
-    deltas = points - np.array(center)
+    Find frames whose (longitude, latitude) falls inside the given covariance ellipse.
 
-    # Inverse covariance matrix
-    inv_cov = np.linalg.inv(cov_matrix)
-
-    # Mahalanobis distance squared
-    mahal_dists = np.einsum("ij,jk,ik->i", deltas, inv_cov, deltas)
-
-    # Mask of points within the ellipse
-    inside_mask = mahal_dists <= threshold
-
-    # Select points inside
-    return list(zip(timestamps[inside_mask], longitudes[inside_mask], latitudes[inside_mask]))
-
-def are_coordinates_within_threshold(coord1, coord2, threshold_meters=0.1):
-    """
-    Checks if two GPS coordinates are within a certain distance threshold.
-
-    Parameters:
-        coord1 (tuple): First GPS coordinate as (latitude, longitude).
-        coord2 (tuple): Second GPS coordinate as (latitude, longitude).
-        threshold_meters (float): The distance threshold in meters.
+    Args:
+        cov_matrix (np.ndarray): 2x2 covariance matrix.
+        center (tuple): (lon, lat) center point.
+        longitudes (np.ndarray): Array of longitude values.
+        latitudes (np.ndarray): Array of latitude values.
+        timestamps (np.ndarray): Array of timestamps.
+        threshold (float): Threshold for Mahalanobis distance (default 1.0).
 
     Returns:
-        bool: True if the coordinates are within the threshold, False otherwise.
+        list of (timestamp, lon, lat): Points inside the ellipse.
     """
-    # Calculate the distance in meters using geodesic (Vincenty formula fallback)
-    distance = geodesic(coord1, coord2).meters
-    #print("distance: ",distance) 
-    return distance <= threshold_meters
+    points = np.column_stack((longitudes, latitudes))
+    deltas = points - np.array(center)
+    inv_cov = np.linalg.inv(cov_matrix)
 
-def find_closest_frame(frame_dir, timestamp):
-    """Find the closest frame to the given timestamp."""
-    frame_files = [f for f in os.listdir(frame_dir) if f.endswith(".png") or f.endswith(".jpg")]
+    # Compute Mahalanobis distance squared
+    mahal_dists = np.einsum("ij,jk,ik->i", deltas, inv_cov, deltas)
 
-    frame_timestamps = []
-    file_to_ts = {}
+    inside_mask = mahal_dists <= threshold
+    return list(zip(timestamps[inside_mask], longitudes[inside_mask], latitudes[inside_mask]))
 
-    for file in frame_files:
-        try:
-            file_ts = 10 ** (-9) * int(file.split(".")[0])
-        except:
-            filename = file.split(".")[0]
-            idx = filename.index("_")
-            file_ts = 10 ** (-9) * int(filename[:idx])
-        
-        frame_timestamps.append(file_ts)
-        file_to_ts[file] = file_ts
-
-    # Now use the original input timestamp here!
-    closest_timestamp = min(frame_timestamps, key=lambda t: abs(t - timestamp))
-    delta_t = abs(closest_timestamp - timestamp)
-
-    if delta_t > 0.3:
-        print("Input timestamp:", timestamp)
-        print("Closest frame timestamp:", closest_timestamp)
-        raise OSError
-
-    tstep_str = str(int(closest_timestamp * 1e9))
-    matching_files = [
-        os.path.join(frame_dir, f)
-        for f in frame_files
-        if tstep_str[:-5] in f
-    ]
-
-    if matching_files:
-        return matching_files[0]
-
-    matching_files = [
-        os.path.join(frame_dir, f)
-        for f in frame_files
-        if tstep_str[:-6] in f
-    ]
-
-    if matching_files:
-        return matching_files[0]
-
-    raise FileNotFoundError(f"No matching file found for timestamp: {tstep_str}")
 
 def precompute_timestamps(covariance_dir):
-    """Precompute all available timestamps from the covariance matrix files."""
-    print("precomputing timestamps ...")
+    """
+    Precompute available timestamps from covariance matrix files.
+
+    Args:
+        covariance_dir (str): Path to covariance matrix directory.
+
+    Returns:
+        list of int: Sorted timestamps in nanoseconds.
+    """
+    print("[INFO] Precomputing timestamps...")
     filenames = glob.glob(os.path.join(covariance_dir, "*.csv"))
-    timestamps = [int(os.path.basename(f).split(".")[0]) for f in filenames]  # Convert nanoseconds to seconds
+    timestamps = [int(os.path.basename(f).split(".")[0]) for f in filenames]
     return sorted(timestamps)
 
-def load_covariance_matrix(covariance_dir,available_timestamps,timestamp,threshold=0.1):
-    """Load the covariance matrix for the given timestamp."""
 
-    # Find the closest available timestamp
-    closest_timestamp = min(available_timestamps, key=lambda t: abs(t - timestamp)) 
-    filename = os.path.join(covariance_dir, f"{closest_timestamp}.csv") 
+def load_covariance_matrix(covariance_dir, available_timestamps, timestamp, threshold=0.1):
+    """
+    Load the covariance matrix closest to a given timestamp.
 
+    Args:
+        covariance_dir (str): Directory containing covariance matrices.
+        available_timestamps (list of int): Available timestamps (nanoseconds).
+        timestamp (float): Target timestamp (nanoseconds).
+        threshold (float): Maximum allowed delta in seconds (default 0.1).
+
+    Returns:
+        np.ndarray or None: Covariance matrix if within threshold, otherwise None.
+    """
+    closest_timestamp = min(available_timestamps, key=lambda t: abs(t - timestamp))
+
+    filename = os.path.join(covariance_dir, f"{closest_timestamp}.csv")
     if not os.path.exists(filename):
-        raise OSError 
+        raise FileNotFoundError(f"[ERROR] Covariance matrix file not found: {filename}")
 
-    # Check if the closest timestamp is within 0.1 seconds
     if abs(timestamp - closest_timestamp) <= threshold:
         return np.genfromtxt(filename)
     else:
-        # If no timestamp is close enough, return None
+        print(f"[INFO] No covariance file close enough (Δt={abs(timestamp - closest_timestamp):.2f}s).")
         return None

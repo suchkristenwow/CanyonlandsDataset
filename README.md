@@ -1,6 +1,6 @@
 # Canyonlands Dataset Toolkit
 
-Welcome to the **Canyonlands Dataset Toolkit** — a collection of Python tools designed to interact with the Canyonlands Dataset, available here: link
+Welcome to the **Canyonlands Dataset Toolkit** — a collection of Python tools designed to interact with the Canyonlands Dataset, available here: <LINK TO DATASET>
 
 This repository provides a set of scripts that:
 
@@ -28,17 +28,33 @@ This repository provides a set of scripts that:
 ## Getting Started
 
 ### 1. Download the Data
-### 2. Clone the Repository
-### 3. Install Dependencies 
-### 4. Example Usage: ROS 2 Rebagification
+The data are divided between May and November, and subsequently by plot. Inside each plot_name.zip you will find:
+    - Front-Facing Camera Images 
+    - Down-Facing Camera Images
+    - Point Clouds 
+    - IMU Data
+    - NMEA Sentences 
+    - LIOSAM results 
+    - Image Projection Results 
+    - GPS Covariance Estimation
+
+The original ROS1 rosbags are separately included under bags. To decompress, simply run:
+```
+    rosbag decompress plotName.bag 
+```
+
+### 2. Clone the Repository & Install Dependencies 
+
+### 3. Example Usage: ROS 2 Rebagification
 ### 4. Example Usage: Multi-Seasonal Comparison
-Set the desired paths inside of configs/ex_config.toml
+Set the desired paths and stitching parameters inside configs/your_config.toml, then run:
+
     ```
-    python get_overlapping_frames.py --config configs/ex_config.toml 
+    python get_overlapping_frames.py --config configs/your_config.toml 
     ```
-This script iterates over each frame in May (since there is only one camera), and searches for overlapping frames within the covariance associated to that timestamp. These frames are then chunked temporarily (to manage image size and memory usage) and stitched. 
+
+This script iterates over each frame in May and searches for overlapping frames from the same plot in November whose centroid falls within the covariance associated with that timestamp. These frames are then temporarily chunked (to manage image size and memory usage) and stitched.In the center the frustrum of these frames is plotted in GPS coordinates. The paths to the constituent images are mapped to each stitched image and pickled. 
+
 #### Example Output
+<p align="center"> <img src="imgs/20221108_100625.jpg" width="600"/> </p> 
 
-
-## Reference 
-If you've found this dataset or the included tools useful you can cite our paper:
