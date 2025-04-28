@@ -49,11 +49,7 @@ This script iterates over each frame in May and searches for overlapping frames 
 
 
 ## Dataset Configuration Files
-The dataset includes all necessary calibration and configuration files to support accurate data usage and reproducibility:
-
-Camera Calibration Files: Located under configs/camera_instrinsics.
-
-- These files provide intrinsics and relative transforms between the cameras, LiDAR, GPS, and IMU frames. The camera extrinsics are provided in the URDFs under configs/LIOSAM/.
+The dataset includes all necessary calibration and configuration files to support usage and reproducibility:
 
 LIOSAM Configuration Files: Located under configs/LIOSAM/.
 
