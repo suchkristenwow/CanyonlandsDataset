@@ -32,6 +32,11 @@ This repository provides a set of scripts that:
 ### 3. Install Dependencies 
 ### 4. Example Usage: ROS 2 Rebagification
 ### 4. Example Usage: Multi-Seasonal Comparison
+Set the desired paths inside of configs/ex_config.toml
+    ```
+    python get_overlapping_frames.py --config configs/ex_config.toml 
+    ```
+This script iterates over each frame in May (since there is only one camera), and searches for overlapping frames within the covariance associated to that timestamp. These frames are then chunked temporarily (to manage image size and memory usage) and stitched. 
 #### Example Output
 
 
