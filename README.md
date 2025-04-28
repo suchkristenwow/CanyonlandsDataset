@@ -51,12 +51,12 @@ This script iterates over each frame in May and searches for overlapping frames 
 ## Dataset Configuration Files
 The dataset includes all necessary calibration and configuration files to support accurate data usage and reproducibility:
 
-    Camera Calibration Files:
-    Located under camera_intrinsics/.
+Camera Calibration Files:
+-     Located under configs/camera_instrinsics.
     These files provide intrinsics and relative transforms between the cameras, LiDAR, GPS, and IMU frames. The camera extrinsics are provided in the URDFs under configs/LIOSAM/.
 
-    LIOSAM Configuration Files:
-    Located under configs/LIOSAM/.
+LIOSAM Configuration Files:
+-     Located under configs/LIOSAM/.
     These YAML configuration files allow users to replicate odometry and mapping results in the map frame using the provided GPS and IMU data. 
 
 ## Down-Facing Camera Frustrum Estimation Pipeline 
