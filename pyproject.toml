@@ -8,7 +8,15 @@ dependencies = [
     "opencv-python",
     "shapely",
     "matplotlib",
-    "toml"
+    "geographiclib",
+    "geopy",
+    "psutil",
+    "PyYAML",
+    "scipy",
+    "tqdm",
+    "toml",
+    "stitching",
+    "py3rosmsgs"
 ]
 
 [build-system]

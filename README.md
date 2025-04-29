@@ -30,10 +30,16 @@ The data are divided between May and November, and subsequently by plot.
 
 The original ROS1 rosbags are separately included under bags. To decompress, simply run:
 ```
-    rosbag decompress plotName.bag 
+rosbag decompress plotName.bag 
 ```
 
 ### 2. Clone the Repository & Install Dependencies 
+
+```
+git clone https://github.com/suchkristenwow/CanyonlandsDataset
+cd ./CanyonlandsDataset
+pip install .
+```
 
 ### 3. Example Usage: ROS 2 Rebagification
 ### 4. Example Usage: Multi-Seasonal Comparison
