@@ -41,6 +41,22 @@ cd ./CanyonlandsDataset
 pip install .
 ```
 
+You only need a ROS 1 installation if you intend to use the estimate_cam_frustum and related processing utilities. 
+
+**Installation example for Ubuntu + ROS Noetic:**
+
+```
+sudo apt update
+sudo apt install \
+    ros-noetic-rospy \
+    ros-noetic-rosbag \
+    ros-noetic-sensor-msgs \
+    ros-noetic-cv-bridge \
+    ros-noetic-tf \
+    ros-noetic-message-filters \
+    ros-noetic-image-geometry
+```
+
 ### 3. Example Usage: ROS 2 Rebagification
 ### 4. Example Usage: Multi-Seasonal Comparison
 Set the desired paths and stitching parameters inside configs/your_config.toml, then run:
