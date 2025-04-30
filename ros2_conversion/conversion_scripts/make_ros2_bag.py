@@ -217,8 +217,8 @@ def main(args=None):
     rclpy.init(args=args)
 
     # path to root dir (where all bags will be stored)
-    dataset_root_dir = '/root/Datasets/canyonlands_dataset'
-    environment = "1conmod_Nov2022" # subdir for ros2 db3 bag and index file
+    dataset_root_dir = '' # SAME as DATASETS_DIR in run_and_enter_container.bash
+    environment = "1conmod_Nov2022" # subdir for ros2 db3 bag and index file (sequence)
 
     # convert
     ROS2BagCreator(dataset_root_dir, environment)
