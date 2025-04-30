@@ -4,10 +4,11 @@ Welcome to the **Canyonlands Dataset Toolkit** — a collection of Python tools 
 
 This repository provides a set of scripts that:
 
-- Search for corresponding image frames between seasons
-- Use covariance ellipsoids to identify well-localized frame clusters
-- Stitch image frames into coherent sets for cross-seasonal analysis
-- Compare sets of frames for visual changes over time
+1. Search for corresponding image frames between seasons
+2. Use covariance ellipsoids to identify well-localized frame clusters
+3. Stitch image frames into coherent sets for cross-seasonal analysis
+4. Compare sets of frames for visual changes over time
+5. Convert the binarized dataset into ROS2 bags
 
 <p align="center"> <img src="imgs/20221108_100625.jpg" width="600"/> </p>
 
@@ -80,3 +81,9 @@ LIOSAM Configuration Files: Located under configs/LIOSAM/.
 ## Down-Facing Camera Frustrum Estimation Pipeline 
 We provide all the scripts used to estimate the GPS coordinates of the down-facing camera frames. For your convenience, you need only to run either ``processing_pipeline_May.py`` or ``processing_pipeline_Nov.py`` along with the desired plot name and configuration file containing the relevant paths.  
 Additionally, to visualize the down-facing camera frustrum while playing the ROS bag, you can use either ``publishDownCamFrames_May.py`` or ``publishDownCamFrames_Nov.py`` 
+
+### 5. ROS1/ROS2 Conversion From Unstructured
+
+**Note: For users purely interested in ROS1 bag playback, we provide *raw* ROS1 bags directly for download Additionally, multiple tools exist to convert a ROS1 bag to ROS2 db3 file. These instructions are so that users can download the binarized data and convert into a ROS1 or ROS2 bag as they please, without needing to redownload items.**. 
+
+Make sure to download at least one of the binarized sequences of the CanyonLands Dataset. 
