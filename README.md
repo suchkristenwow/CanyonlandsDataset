@@ -84,6 +84,48 @@ Additionally, to visualize the down-facing camera frustrum while playing the ROS
 
 ### 5. ROS1/ROS2 Conversion From Unstructured
 
-**Note: For users purely interested in ROS1 bag playback, we provide *raw* ROS1 bags directly for download Additionally, multiple tools exist to convert a ROS1 bag to ROS2 db3 file. These instructions are so that users can download the binarized data and convert into a ROS1 or ROS2 bag as they please, without needing to redownload items.**. 
+**Note: For users purely interested in ROS1 bag playback, we provide *raw* ROS1 bags directly for download Additionally, if you already have ROS1 bags but would like to have ROS2 bags, multiple tools exist to convert a ROS1 bag to ROS2 db3 file. *These instructions are so that users can download the binarized data and convert into a ROS1 or ROS2 bag as they please, without needing to redownload items.***
 
-Make sure to download at least one of the binarized sequences of the CanyonLands Dataset. 
+Make sure to download at least one of the binarized sequences of the CanyonLands Dataset. Also, if you dont yet have Docker on your machine, please make sure to install it now.
+
+Enter the ros_conversion directory available at the root of the repository.
+
+```
+cd ros_conversion/
+```
+
+Here, you can convert to a ROS1 bag by entering the *ros1* directory and a ROS2 bag by entering the *ros2* directory. We will proceed this example by entering the *ros2* directory, though instructions are quite similar for both.
+
+You should now be in:
+
+```
+ros_conversion/ros2/
+```
+
+Here you can run the following:
+
+```
+sudo bash docker/build_docker.sh
+```
+
+This will build the Docker container needed to convert the unstructured files to a ROS2 bag. You should see the following:
+
+<p align="center"> <img src="imgs/docker_build.png" width="800"/> </p> 
+
+Once the container is built, you will need to link it to the *conversion_scripts* directory in the *ros2* directory. To do this, you will need to update the bash file *run_and_enter_container.bash* in the *docker* directory with the global paths to where your *conversion_scripts* directory is and where you have stored the dataset on your machine. Also, make sure to update the *make_ros2_bag.py* file in this directory with the paths to where your unstructured directories are, as well as the sequence you will be converting to a ROS2 bag. 
+
+After doing this, you should be able to enter the container.
+
+Source ROS2 Humble using
+
+```
+source /opt/ros/humble/setup.bash
+```
+
+Convert the unstructured data you have specified to ROS2:
+
+```
+python conversion_scripts/make_ros2_bag.py
+```
+
+Once your ROS2 bag is ready, it will be in the DATASETS_DIR directory that you specified in the *run_and_enter_container.bash* bash script.
