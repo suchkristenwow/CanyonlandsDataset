@@ -18,6 +18,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
+plt.ioff() 
 from shapely.geometry import Polygon
 from shapely.ops import unary_union
 
@@ -55,23 +56,49 @@ tracemalloc.start()
 import threading 
 import time 
 
-def index_image_dir(image_dir):
-    """
-    Create a dict mapping timestamps (from filenames) to full file paths.
-    Assumes filenames are like '1234567890123456789.png'
-    """
-    print("indexing this dir: ",image_dir)
-    return {
-        int(os.path.splitext(f)[0]): os.path.join(image_dir, f)
-        for f in os.listdir(image_dir) if f.endswith(".png")
-    }
+import subprocess
+import uuid
 
-def find_from_index(index_dict, ts):
-    """
-    Lookup timestamp in prebuilt index.
-    Returns file path or None if not found.
-    """
-    return index_dict.get(ts, None)
+def call_stitch_subprocess(frame_list):
+    tmp_file = f"/tmp/frame_list_{uuid.uuid4().hex}.pkl"
+    with open(tmp_file, 'wb') as f:
+        pickle.dump(frame_list, f)
+
+    result = subprocess.run(["python3", "src/seasonal_comparison/img_stitch_worker.py", tmp_file], check=True)
+    return result
+
+def index_image_dir(image_dir):
+    index = {}
+    for f in os.listdir(image_dir):
+        if not f.endswith(".png"):
+            continue
+        basename = os.path.splitext(f)[0]
+        try:
+            ts = int(basename)
+            index[ts] = os.path.join(image_dir, f)
+        except ValueError:
+            print(f"[WARN] Could not parse timestamp from {f}")
+    return index
+
+def find_from_index(index_dict, ts_seconds, threshold_sec=0.2):
+    ts_ns = int(round(ts_seconds * 1e9))  # Convert to int nanoseconds
+    all_keys = np.array(list(index_dict.keys()))
+
+    if len(all_keys) == 0:
+        print("[WARN] Empty index_dict!")
+        return None
+
+    # Compute absolute time difference
+    diffs = np.abs(all_keys - ts_ns)
+    min_idx = np.argmin(diffs)
+    min_diff = diffs[min_idx]
+
+    if min_diff > threshold_sec * 1e9:
+        print(f"[WARN] Closest image too far: {min_diff/1e9:.3f}s for {ts_ns}")
+        return None
+
+    nearest_ts = all_keys[min_idx]
+    return index_dict[nearest_ts]
 
 def rotate_image_north(image, heading_deg):
     center = tuple(np.array(image.shape[1::-1]) / 2)
@@ -114,7 +141,8 @@ def fuse_front_facing_images(timestamp, may_front_frames, nov_front_frames, path
         out_path = os.path.join(may_front_facing_img_dir, "stitched_front.jpg")
         print(f"Writing: {out_path}")
         cv.imwrite(out_path, stitched_front_img)
-        del stitched_front_img
+        del stitched_front_img 
+        cv.destroyAllWindows() 
     except Exception as e:
         print(f"[ERROR] May front-facing stitching failed: {e}")
 
@@ -128,6 +156,7 @@ def fuse_front_facing_images(timestamp, may_front_frames, nov_front_frames, path
         print(f"Writing: {out_path}")
         cv.imwrite(out_path, stitched_front_img)
         del stitched_front_img
+        cv.destroyAllWindows() 
     except Exception as e:
         print(f"[ERROR] Nov front-facing stitching failed: {e}")
 
@@ -166,6 +195,14 @@ def main():
     nov_timestamps = nov_data[:, 0]
     left_cam_lat, left_cam_lon = nov_data[:, 23], nov_data[:, 24]
     right_cam_lat, right_cam_lon = nov_data[:, 33], nov_data[:, 34]
+    '''
+    writer.writerow(['timestamp', 'lat', 'lon', 'pointer_lat', 'pointer_lon',
+        'ouster_lat', 'ouster_lon', 'frontLeftWheel_lat', 'frontLeftWheel_lon',
+        'frontRightWheel_lat', 'frontRightWheel_lon', 'rearLeftWheel_lat', 'rearLeftWheel_lon',
+        'rearRightWheel_lat', 'rearRightWheel_lon', 'cam_lat', 'cam_lon',
+        'topRight_frame_lat', 'topRight_frame_lon', 'topLeft_frame_lat', 'topLeft_frame_lon',
+        'bottomRight_frame_lat', 'bottomRight_frame_lon', 'bottomLeft_frame_lat', 'bottomLeft_frame_lon'])
+    ''' 
 
     may_cov_dir = os.path.join(paths["may_results"], "covariance_matrices")
     may_cov_timestamps = precompute_timestamps(may_cov_dir)
@@ -200,44 +237,13 @@ def main():
         left_frames_tuple = find_frames_inside_ellipse(scaled_cov, center, left_cam_lon, left_cam_lat, nov_timestamps)
         right_frames_tuple = find_frames_inside_ellipse(scaled_cov, center, right_cam_lon, right_cam_lat, nov_timestamps)
 
-        if not (left_frames_tuple or right_frames_tuple):
+        if not (may_frames_tuple or left_frames_tuple or right_frames_tuple):
             print("[WARN] No overlapping frames found.")
             continue
-
+        
         print("[INFO] finding frames ...")
-        t0 = time.time() 
-        """
-        may_frames = [
-            find_closest_file(paths["may_images"], ts[0])
-            for ts in sorted(may_frames_tuple, key=lambda x: x[0])
-            if find_closest_file(paths["may_images"], ts[0])
-        ]
 
-        may_front_frames = [
-            find_closest_file(paths["may_front_images"], ts[0])
-            for ts in sorted(may_frames_tuple, key=lambda x: x[0])
-            if find_closest_file(paths["may_front_images"], ts[0])
-        ]
-
-        left_frames = [
-            find_closest_file(paths["nov_left_images"], ts[0])
-            for ts in sorted(left_frames_tuple, key=lambda x: x[0])
-            if find_closest_file(paths["nov_left_images"], ts[0])
-        ]
-        right_frames = [
-            find_closest_file(paths["nov_right_images"], ts[0])
-            for ts in sorted(right_frames_tuple, key=lambda x: x[0])
-            if find_closest_file(paths["nov_right_images"], ts[0])
-        ]
-
-        nov_front_frames = [
-            find_closest_file(paths["nov_front_images"], ts[0])
-            for ts in sorted(left_frames_tuple, key=lambda x: x[0])
-            if find_closest_file(paths["nov_front_images"], ts[0])
-        ]
-        print("[INFO] Done finding overlapping frames!") 
-        """
-
+        #print("[DEBUG] Trying to look up these timestamps:", [ts[0] for ts in may_frames_tuple]) 
         # Extract May frames
         may_frames = [
             find_from_index(may_image_index, ts[0])
@@ -269,8 +275,12 @@ def main():
             for ts in sorted(left_frames_tuple, key=lambda x: x[0])
             if find_from_index(nov_front_image_index, ts[0])
         ]
-        t1 = time.time() 
-        print(f"[INFO] finding frames took {t1 - t0:.2f} seconds")  
+
+        if not left_frames and not right_frames:
+            raise OSError 
+
+        if not (may_frames):
+            raise OSError 
 
         output_dir_timestamp = os.path.join(paths["match_output_dir"], str(timestamp))
         os.makedirs(output_dir_timestamp, exist_ok=True)
@@ -351,7 +361,6 @@ def main():
                     #log_mem()
 
                     nov_polygon_list = create_polygons(nov_panos[nov_img_path])
-                    #print(f"[DEBUG] {len(nov_polygon_list)} Nov polygons created for {fused_img_path}")  
 
                     if not (may_polygon_list and nov_polygon_list):
                         continue
@@ -359,27 +368,23 @@ def main():
                     may_union = unary_union(may_polygon_list)
                     nov_union = unary_union(nov_polygon_list)
 
-                    buffer_deg = 1e-7 #~1 meter ≈ 1e-5 degrees
                     max_centroid_dist = 1e-6 
 
                     may_centroid = may_union.centroid
                     nov_centroid = nov_union.centroid
 
                     if may_centroid.distance(nov_centroid) > max_centroid_dist:
-                        #print(f"[SKIP] Centroids too far: {may_centroid.distance(nov_centroid)} degrees")
+                        #print(f"[INFO] Skipping comparison figs... Centroids too far: {may_centroid.distance(nov_centroid)} degrees")
                         continue
-
-                    # Minimal buffer just to handle numerical precision
-                    overlap = may_union.buffer(buffer_deg).intersects(nov_union.buffer(buffer_deg))
+                    
+                    overlap = unary_union(may_polygon_list).intersects(unary_union(nov_polygon_list))
                     if not overlap:
-                        #print("[SKIP] No overlap even after minimal buffering.")
-                        continue
-                    else: 
-                        print("[INFO] found overlapping frames!")  
+                        #print("[INFO] Skipping comparison figs... no overlap detected!") 
+                        continue 
 
                     gps_plot_path = os.path.join(output_img_dir, f"gps_plot_{fused_img_counter}.png")
                     comparison_plot_path = os.path.join(output_img_dir, f"comparison_plot_{fused_img_counter}.png")
-
+                
                     print("[INFO] Making gps plot ...")
                     make_gps_plot(may_data, nov_data, may_polygon_list, nov_polygon_list, nov_img_path, gps_plot_path)
                     log_mem() 
@@ -388,12 +393,11 @@ def main():
                     gc.collect() 
 
                     #Debugging memory creep
-                    '''
                     snapshot = tracemalloc.take_snapshot()
                     top_stats = snapshot.statistics('lineno')
                     for stat in top_stats[:10]:
                         print(stat)
-                    '''
+
 
                     print("[INFO] Making comparison fig ...")
                     make_comparison_fig(may_data, nov_data, may_polygon_list, nov_polygon_list, fused_img_path, nov_img_path, comparison_plot_path)
@@ -402,22 +406,14 @@ def main():
                     plt.close('all')
                     gc.collect()
 
-                    input("Hol Up")
+                    print("[INFO:main] memory usage after closing the debug figures ...")
+                    log_mem()
 
                     #Debugging memory creep
-                    '''
                     snapshot = tracemalloc.take_snapshot()
                     top_stats = snapshot.statistics('lineno')
                     for stat in top_stats[:10]:
                         print(stat)
-                    ''' 
-                    #Memory Management 
-                    plt.clf()
-                    plt.close('all')
-                    gc.collect()
-
-                    print("[INFO:main] memory usage after closing the debug figures ...")
-                    log_mem()
 
                     csv_writer.writerow([gps_plot_path, fused_img_path, nov_img_path])
 
@@ -434,110 +430,90 @@ def main():
         log_mem()
         thread.join()  
         
-def stitch_and_save(frame_list, output_dir, processed_compass_headings, stitch_cfg, prefix):
-    """Stitch rotated images and save stitched panoramas + corner info."""
-    #--medium_megapix -1 --low_megapix -1 --final_megapix -1
-    stitcher = AffineStitcher(crop=False, confidence_threshold=stitch_cfg["confidence_threshold"], medium_megapix=-1, low_megapix=-1,final_megapix=-1) 
-    if stitcher is None:
-        print("stitcher is None right after initialization")
-        raise OSError 
 
+def stitch_and_save(frame_list, output_dir, processed_compass_headings, stitch_cfg, prefix):
+    """Helper function to stitch frames and save results."""
     panos = {}
     fused_img_count = 0
     chunks = chunk_filenames(frame_list)
 
-    # Extract compass heading columns
-    compass_timestamps = processed_compass_headings[:, 0]
-    compass_headings_deg = processed_compass_headings[:, 1]
-
-    # Directory to store rotated frames for inspection
-    rotated_dir = os.path.join(output_dir, "..", "rotated_frames", prefix)
-    os.makedirs(rotated_dir, exist_ok=True)
+    stitcher = AffineStitcher(crop=False, confidence_threshold=stitch_cfg["confidence_threshold"])
 
     for chunk in chunks:
-        print("[INFO: stitch_and_save] iterating through chunks")
         log_mem()
-        rotated_image_paths = []
+        stitched_img = None 
 
-        # Step 1: Rotate and save each image in the chunk
-        for path in chunk:
-            img = cv.imread(path)
-            if img is None:
-                print(f"[WARN] Failed to load image {path}")
-                continue
+        if not check_image_sizes(chunk):
+            print("Images are different sizes!!")
+            for path in chunk:
+                img = cv.imread(path) 
+                print(img.shape)
+            print("chunk:",chunk)
+            raise OSError
 
-            try:
-                print("path:",path)
-                ts = int(os.path.splitext(os.path.basename(path))[0])
-                heading = get_heading(ts, processed_compass_headings)
-                img_rotated = rotate_image_north(img, heading)
-            except Exception as e:
-                print(f"[ERROR] Error rotating image {path}: {e}")
-                continue
-
-            tmp_path = os.path.join(rotated_dir, f"rotated_{ts}.png")
-            cv.imwrite(tmp_path, img_rotated)
-            rotated_image_paths.append(tmp_path)
-
-            del img, img_rotated
-            img = None; img_rotated = None;
-
-        # Step 2: Attempt stitching
         try:
-            if not rotated_image_paths:
-                print("[WARN] No valid images to stitch.")
-                continue
-
-            if not stitcher:
-                print("[ERROR] stitcher is NONE")
-                raise OSError 
-
-            if not check_image_sizes(rotate_image_paths):
-                print("[ERROR] these images are not all the same size")
-                raise OSError  
-
-            stitched_img = stitcher.stitch(rotated_image_paths)
-            print("[INFO] cropping black padding!")
-            stitched_img = crop_black_border(stitched_img)  # Crop black padding 
-
-            # Optional: Delete rotated images to save disk
-            for tmp_path in rotated_image_paths:
-                try:
-                    os.remove(tmp_path)
-                except Exception as e:
-                    print(f"[WARN] Failed to delete {tmp_path}: {e}")
-
+            #stitched_img = stitcher.stitch(chunk)
+            stitched_img = call_stitch_subprocess(chunk)
+            stitched_img = crop_connected_region(stitched_img)
         except Exception as e:
-            print(f"[ERROR] Image stitching failed: {e}")
-            stitched_img = None
+            print(f"Image stitching failed: {e}")
+            if stitched_img:
+                del stitched_img 
             continue
-            
-        rotated_image_paths.clear() 
-        rotate_image_paths = None 
-        gc.collect() 
 
-        # Step 3: Save stitched image if successful
-        if stitched_img is None:
-            continue
+        avg_heading = np.mean([
+            get_heading(int(os.path.splitext(os.path.basename(path))[0]), processed_compass_headings)
+            for path in chunk
+        ])
+
+        # Extract timestamps from filenames
+        timestamps = [
+            int(os.path.splitext(os.path.basename(path))[0]) for path in chunk
+        ]
+
+        # Get headings for each frame
+        headings = np.array([
+            get_heading(ts, processed_compass_headings) for ts in timestamps
+        ])
+
+        headings_rad = np.deg2rad(headings) 
+
+        # Compute mean using circular statistics
+        mean_sin = np.mean(np.sin(headings_rad))
+        mean_cos = np.mean(np.cos(headings_rad))
+        circular_mean_rad = np.arctan2(mean_sin, mean_cos)
+        circular_mean_deg = np.rad2deg(circular_mean_rad) % 360
+
+        # Compute circular standard deviation
+        R = np.sqrt(mean_sin**2 + mean_cos**2)
+        circular_std_deg = np.rad2deg(np.sqrt(-2 * np.log(R)))  # circular std dev
+
+        if circular_std_deg > 15:
+            print("[WARN] High variance in heading ... skipping")
+            print(f"[DEBUG] Headings for chunk:")
+            print(f"  circular mean: {circular_mean_deg:.2f}°")
+            print(f"  circular std: {circular_std_deg:.2f}°")
+            continue 
+        
+        stitched_img = rotate_image_north(stitched_img, avg_heading) 
+        stitched_img = crop_connected_region(stitched_img) 
+        stitched_img = crop_black_border(stitched_img) 
 
         chunk_path = os.path.join(output_dir, f"{fused_img_count}.png")
-        print("[INFO] writing stitched image to: ",chunk_path)
+        print(f"Writing stitched image: {chunk_path}")
         cv.imwrite(chunk_path, stitched_img)
 
-        del stitched_img
-        stitched_img = None 
-        gc.collect() 
+        del stitched_img 
 
-        # Step 4: Store corner metadata
         fused_corners = [gps_lookup(path) for path in chunk]
         panos[chunk_path] = fused_corners
-        print(f"[DEBUG] {chunk_path} includes {len(fused_corners)} GPS frames") 
 
         fused_img_count += 1
 
-    # Step 5: Save corner data as pickle
+    del chunk, chunks 
+
     pickle_path = os.path.join(output_dir, f"{prefix}_panos.pickle")
-    print(f"Saving metadata to {pickle_path}")
+    #print(f"Saving to {pickle_path}")
     with open(pickle_path, "wb") as handle:
         pickle.dump(panos, handle)
 

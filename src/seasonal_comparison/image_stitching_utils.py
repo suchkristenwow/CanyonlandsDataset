@@ -9,7 +9,6 @@ import os
 import numpy as np
 import cv2 as cv
 from shapely.geometry import Polygon
-
 from seasonal_comparison.general_utils import robust_load_csv
 
 def chunk_filenames(filenames, chunk_size=5):
@@ -202,6 +201,7 @@ def check_image_sizes(image_paths):
         elif img.shape != reference_shape:
             print(f"[MISMATCH] {path} has shape {img.shape}, expected {reference_shape}")
             return False
+    return True 
 
 def crop_black_border(image, tol=10):
     """

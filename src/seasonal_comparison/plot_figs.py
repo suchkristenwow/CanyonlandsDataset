@@ -9,6 +9,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
+plt.ioff() 
 import matplotlib.gridspec as gridspec
 import matplotlib.patches as mpatches
 from matplotlib.patches import Polygon as MplPolygon
@@ -19,6 +20,8 @@ from shapely.ops import unary_union
 from geographiclib.geodesic import Geodesic
 
 from seasonal_comparison.image_stitching_utils import check_corner_uniqueness
+
+import gc 
 
 def find_largest_overlap_subset(polygons):
     """
@@ -198,7 +201,8 @@ def make_comparison_fig(may_data,nov_data,may_polygon_list,nov_polygon_list,fuse
         # Then create a *new* patch for ax1
         patch_copy = MplPolygon(ordered_corners, fill=True, facecolor='blue', alpha=0.25)
         ax1.add_patch(patch_copy)
- 
+    
+    del patch, patch_copy 
 
     nov_overlap_subset = find_largest_overlap_subset(nov_polygon_list)
     poly_color = "orange" if "Right" in nov_img_path else "red"
@@ -212,6 +216,8 @@ def make_comparison_fig(may_data,nov_data,may_polygon_list,nov_polygon_list,fuse
         # Then create a *new* patch for ax1
         patch_copy = MplPolygon(ordered_corners, fill=True, facecolor=poly_color, alpha=0.25)
         ax1.add_patch(patch_copy)
+    
+    del patch, patch_copy  
 
     # Setup GPS plot
     ax1.set_xlabel("Longitude")
@@ -281,6 +287,7 @@ def make_comparison_fig(may_data,nov_data,may_polygon_list,nov_polygon_list,fuse
     
     fig.clf()
     plt.close(fig)
+    gc.collect()
 
     return fig 
 
