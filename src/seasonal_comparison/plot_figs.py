@@ -4,6 +4,10 @@ import os
 
 import numpy as np
 import cv2 as cv
+
+import matplotlib
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.patches as mpatches
@@ -272,9 +276,13 @@ def make_comparison_fig(may_data,nov_data,may_polygon_list,nov_polygon_list,fuse
     ax2.set_title(f"November Fused Image\n{os.path.basename(nov_img_path)}", fontsize=10)
 
     plt.tight_layout(rect=[0, 0, 1, 0.95])  
-    #print(f"Writing {output_path}")
+    print(f"Writing {output_path}")
     plt.savefig(output_path)
-    plt.close() 
+    
+    fig.clf()
+    plt.close(fig)
+
+    return fig 
 
 def make_gps_plot(may_data,nov_data,may_polygon_list,nov_polygon_list,nov_img_path,output_path):
     fig, ax = plt.subplots()
@@ -306,15 +314,12 @@ def make_gps_plot(may_data,nov_data,may_polygon_list,nov_polygon_list,nov_img_pa
         ax.add_patch(patch)
 
     # Create proxy artists
-    may_outline = mpatches.Patch(facecolor='none', edgecolor='blue', label='May Frames')
-    nov_left_outline = mpatches.Patch(facecolor='none', edgecolor='red', label='Nov Frames (Left)')
-    nov_right_outline = mpatches.Patch(facecolor='none', edgecolor='orange', label='Nov Frames (Right)')
     may_fused = mpatches.Patch(facecolor='blue', alpha=0.25, label='May Fused Area')
     nov_fused = mpatches.Patch(facecolor=poly_color, alpha=0.25, label='Nov Fused Area')
 
     # Add legend
     ax.legend(
-        handles=[may_outline, nov_left_outline, nov_right_outline, may_fused, nov_fused],
+        handles=[may_fused, nov_fused],
         loc='center left',
         bbox_to_anchor=(-0.35, 1.2),
         fontsize=8
@@ -350,6 +355,10 @@ def make_gps_plot(may_data,nov_data,may_polygon_list,nov_polygon_list,nov_img_pa
     # Set aspect ratio to equal (important for GPS maps!)
     ax.set_aspect('equal', adjustable='box')
 
-    #print(f"Wrote {output_path}")
+    print(f"Writing {output_path}")
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
-    plt.close()
+
+    fig.clf()
+    plt.close(fig)
+
+    return fig 

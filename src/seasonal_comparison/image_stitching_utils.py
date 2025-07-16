@@ -174,4 +174,48 @@ def find_closest_file(directory, target_ts_sec, tolerance_sec=0.1):
         return os.path.join(directory, closest[1])
     else:
         print(f"[!] Could not find a filename within {tolerance_sec:.2f} sec threshold!")
-        return None
+        return None 
+
+def check_image_sizes(image_paths):
+    """
+    Checks if all images in the list have the same shape.
+
+    Args:
+        image_paths (list of str): Paths to the image files.
+
+    Returns:
+        bool: True if all images are the same size, False otherwise.
+    """
+    if not image_paths:
+        print("[WARN] No images to check.")
+        return False
+
+    reference_shape = None
+    for path in image_paths:
+        img = cv.imread(path)
+        if img is None:
+            print(f"[WARN] Could not load image: {path}")
+            continue
+
+        if reference_shape is None:
+            reference_shape = img.shape
+        elif img.shape != reference_shape:
+            print(f"[MISMATCH] {path} has shape {img.shape}, expected {reference_shape}")
+            return False
+
+def crop_black_border(image, tol=10):
+    """
+    Crops black borders from an image.
+    `tol` is the tolerance for pixel brightness to be considered black.
+    """
+    gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+    _, thresh = cv.threshold(gray, tol, 255, cv.THRESH_BINARY)
+    
+    coords = cv.findNonZero(thresh)
+    if coords is None:
+        print("everything is black")
+        raise OSError 
+
+    x, y, w, h = cv.boundingRect(coords)
+    cropped = image[y:y+h, x:x+w]
+    return cropped
