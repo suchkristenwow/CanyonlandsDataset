@@ -59,12 +59,8 @@ import time
 import subprocess
 import uuid
 
-def call_stitch_subprocess(frame_list):
-    tmp_file = f"/tmp/frame_list_{uuid.uuid4().hex}.pkl"
-    with open(tmp_file, 'wb') as f:
-        pickle.dump(frame_list, f)
-
-    result = subprocess.run(["python3", "src/seasonal_comparison/img_stitch_worker.py", tmp_file], check=True)
+def call_stitch_subprocess(frame_list,stitch_cfg):
+    result = subprocess.run(["python3", "src/seasonal_comparison/img_stitch_worker.py", frame_list, stitch_cfg], check=True)
     return result
 
 def index_image_dir(image_dir):
@@ -437,8 +433,7 @@ def stitch_and_save(frame_list, output_dir, processed_compass_headings, stitch_c
     fused_img_count = 0
     chunks = chunk_filenames(frame_list)
 
-    stitcher = AffineStitcher(crop=False, confidence_threshold=stitch_cfg["confidence_threshold"])
-
+    
     for chunk in chunks:
         log_mem()
         stitched_img = None 
@@ -453,7 +448,7 @@ def stitch_and_save(frame_list, output_dir, processed_compass_headings, stitch_c
 
         try:
             #stitched_img = stitcher.stitch(chunk)
-            stitched_img = call_stitch_subprocess(chunk)
+            stitched_img = call_stitch_subprocess(chunk,stitch_cfg)
             stitched_img = crop_connected_region(stitched_img)
         except Exception as e:
             print(f"Image stitching failed: {e}")

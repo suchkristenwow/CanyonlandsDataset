@@ -2,15 +2,14 @@
 import sys
 import pickle
 import cv2 as cv
-from stitching import Stitcher
+from stitching import AffineStitcher
 
-def main(frame_list_path):
-    with open(frame_list_path, 'rb') as f:
-        frame_list = pickle.load(f)
-
-    stitcher = Stitcher()
+def main(frame_list_path,stitch_cfg):
+    print("frame_list: ",frame_list) 
+    print("stitch_cfg: ",stitch_cfg) 
+    stitcher = AffineStitcher(crop=False, confidence_threshold=stitch_cfg["confidence_threshold"])
     stitched_img = stitcher.stitch(frame_list)
     return stitched_img 
 
 if __name__ == '__main__':
-    main(sys.argv[1])
+    main(sys.argv[1],sys.argv[2])
