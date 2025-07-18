@@ -9,6 +9,43 @@ import argparse
 import toml
 import psutil 
 import os 
+import math 
+
+
+def get_ellipse_bounds(ellipse):
+    center = np.array(ellipse.get_center())
+    width = ellipse.width
+    height = ellipse.height
+    angle_deg = ellipse.angle
+    angle_rad = np.deg2rad(angle_deg)
+
+    # Sample N points on ellipse
+    t = np.linspace(0, 2 * np.pi, 100)
+    x = 0.5 * width * np.cos(t)
+    y = 0.5 * height * np.sin(t)
+
+    # Rotate points
+    R = np.array([
+        [np.cos(angle_rad), -np.sin(angle_rad)],
+        [np.sin(angle_rad),  np.cos(angle_rad)]
+    ])
+    rotated_points = np.dot(R, np.vstack((x, y)))
+
+    # Translate to center
+    latlon_points = rotated_points + center.reshape(2, 1)
+
+    # Extract bounds
+    min_lon, max_lon = np.min(latlon_points[0]), np.max(latlon_points[0])
+    min_lat, max_lat = np.min(latlon_points[1]), np.max(latlon_points[1])
+
+    return min_lat, max_lat, min_lon, max_lon
+
+
+def same_order_of_magnitude(a, b):
+    if a == 0 or b == 0:
+        return a == b  # Only 0 is same order as 0
+
+    return math.floor(math.log10(abs(a))) == math.floor(math.log10(abs(b)))
 
 def load_config(config_path):
     return toml.load(config_path)
@@ -33,6 +70,11 @@ def find_closest_index(array, target, max_delta_t=None):
     Returns:
         int or None: Index of the closest value, or None if no value is within max_delta_t.
     """
+    if not same_order_of_magnitude(array[0],target):
+        print("array[0]: ",array[0])
+        print("target:",target)
+        raise OSError 
+
     array = np.asarray(array)
     idx = np.argmin(np.abs(array - target))
     closest_diff = abs(array[idx] - target)

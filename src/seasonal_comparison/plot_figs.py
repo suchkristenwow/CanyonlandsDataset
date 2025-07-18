@@ -23,6 +23,7 @@ from seasonal_comparison.image_stitching_utils import check_corner_uniqueness
 
 import gc 
 
+
 def find_largest_overlap_subset(polygons):
     """
     Given a list of polygons, find the largest subset where all polygons overlap at least partially.

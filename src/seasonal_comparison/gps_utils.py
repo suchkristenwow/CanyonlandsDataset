@@ -11,11 +11,12 @@ import numpy as np
 
 from shapely.geometry import Polygon
 
-from seasonal_comparison.general_utils import robust_load_csv
+from seasonal_comparison.general_utils import robust_load_csv, same_order_of_magnitude
 
 # Constants for meter-to-degree scaling
 LAT_METERS_PER_DEGREE = 111_320
 LON_METERS_PER_DEGREE = 85_390
+
 
 def scale_covariance_to_degrees(cov_matrix):
     """
@@ -110,6 +111,12 @@ def load_covariance_matrix(covariance_dir, available_timestamps, timestamp, thre
     Returns:
         np.ndarray or None: Covariance matrix if within threshold, otherwise None.
     """
+    
+    if not same_order_of_magnitude(available_timestamps[0],timestamp):
+        tmp_timestamp = timestamp * 10**9 
+        if same_order_of_magnitude(available_timestamps[0],tmp_timestamp):
+            timestamp = timestamp * 10**9 
+
     closest_timestamp = min(available_timestamps, key=lambda t: abs(t - timestamp))
 
     filename = os.path.join(covariance_dir, f"{closest_timestamp}.csv")
