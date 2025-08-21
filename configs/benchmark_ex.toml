@@ -1,12 +1,13 @@
 [paths]
-may_results = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/May2022_1conmod/processed_results"
-nov_results = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/Nov2022_1conmod/1conmod/processed_results"
+may_results = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/May2022/1conmod/processed_results"
+nov_results = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/Nov2022/1conmod/processed_results"
 match_output_dir = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/matches_fused"
-may_images = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/May2022_1conmod/Down_Facing_Images"
-may_front_images = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/May2022_1conmod/Front_Facing_Images"
-nov_left_images = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/Nov2022_1conmod/1conmod/Left_Down_Facing_Images"
-nov_right_images = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/Nov2022_1conmod/1conmod/Right_Down_Facing_Images"
-nov_front_images = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/Nov2022_1conmod/1conmod/Front_Facing_Images"
+may_images = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/May2022/1conmod/Down_Facing_Images"
+may_front_images = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/May2022/1conmod/Front_Facing_Images"
+nov_left_images = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/Nov2022/1conmod/Left_Down_Facing_Images"
+nov_right_images = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/Nov2022/1conmod/Right_Down_Facing_Images"
+nov_front_images = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/Nov2022/1conmod/Front_Facing_Images"
+stitch_img_pairs_path = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/1conmod_stitched_pairs.txt" 
 [stitching]
 crop = false
 confidence_threshold = 0.5

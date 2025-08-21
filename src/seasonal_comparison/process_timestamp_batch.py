@@ -19,7 +19,8 @@ from seasonal_comparison.image_stitching_utils import (
     find_from_index,
     create_polygons,
     create_polygon,
-    fix_polygon_area 
+    fix_polygon_area,
+    get_heading
 )
 from seasonal_comparison.general_utils import (
     robust_load_csv,
@@ -40,9 +41,9 @@ from seasonal_comparison.geometry_utils import (
     find_intersecting_clusters
 ) 
 
-
+import os 
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use(os.environ.get("MPLBACKEND", "Agg"))
 from matplotlib.patches import Ellipse, Rectangle
 import matplotlib.pyplot as plt
 plt.ioff() 
@@ -52,11 +53,9 @@ import matplotlib.lines as mlines
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes 
 import matplotlib.cm as cm
 import matplotlib.colors as mcolors
-
+from scipy.stats import circmean 
 from shapely.geometry import Polygon
 from shapely.ops import unary_union
-
-import os
 import csv
 import gc
 import pickle
@@ -180,9 +179,10 @@ class seasonalComparer:
             args=(timestamp, may_front_frames, nov_front_frames),
             daemon=False  
         )
+        print("started front stitch thread!")
         self.front_stitch_thread.start()
 
-    def get_frames(self,scaled_cov,center):
+    def get_frames(self,t,scaled_cov,center):
         frames_dict = {}
 
         # Find overlapping frames
@@ -191,17 +191,6 @@ class seasonalComparer:
         left_frames_tuple = find_frames_inside_ellipse(scaled_cov, center, self.left_cam_lon, self.left_cam_lat, self.nov_timestamps)
         right_frames_tuple = find_frames_inside_ellipse(scaled_cov, center, self.right_cam_lon, self.right_cam_lat, self.nov_timestamps)
         
-        '''
-        print(f"[DEBUG] Found {len(may_frames_tuple)} overlapping May frames")
-        print(f"[DEBUG] May timestamps in region: {[ts[0] for ts in may_frames_tuple]}") 
-
-        print(f"[DEBUG] Found {len(left_frames_tuple)} overlapping left frames")
-        print(f"[DEBUG] Nov:Left timestamps in region: {[ts[0] for ts in left_frames_tuple]}")
-
-        print(f"[DEBUG] Found {len(right_frames_tuple)} overlapping right frames")
-        print(f"[DEBUG] Nov:Right timestamps in region: {[ts[0] for ts in right_frames_tuple]}")
-        ''' 
-
         if not (may_frames_tuple or left_frames_tuple or right_frames_tuple):
             print("[WARN] No overlapping frames found.")
             return 
@@ -243,17 +232,133 @@ class seasonalComparer:
         ]
         frames_dict['nov_front_frames'] = nov_front_frames
 
-        if not left_frames and not right_frames:
-            raise OSError 
+        if not left_frames and not right_frames or not (may_frames):
+            print(f"[DEBUG] Found {len(may_frames_tuple)} overlapping May frames")
+            #print(f"[DEBUG] May timestamps in region: {[ts[0] for ts in may_frames_tuple]}") 
 
-        if not (may_frames):
-            raise OSError 
+            print(f"[DEBUG] Found {len(left_frames_tuple)} overlapping left frames")
+            #print(f"[DEBUG] Nov:Left timestamps in region: {[ts[0] for ts in left_frames_tuple]}")
+
+            print(f"[DEBUG] Found {len(right_frames_tuple)} overlapping right frames")
+            #print(f"[DEBUG] Nov:Right timestamps in region: {[ts[0] for ts in right_frames_tuple]}")
+            print("[WARN] NO FRAMES!")
+            self.debug_no_frames(t,scaled_cov,center) 
+            return 
 
         self.debug_ellipse_plot(scaled_cov, center, frames_dict)
         self.cluster_polygons_plot(scaled_cov,center,frames_dict) 
-        #input("Check debug plot")
 
         return frames_dict 
+
+    '''
+        may_data: 
+        writer.writerow(['timestamp', 'lat', 'lon', 'pointer_lat', 'pointer_lon',
+            'ouster_lat', 'ouster_lon', 'frontLeftWheel_lat', 'frontLeftWheel_lon',
+            'frontRightWheel_lat', 'frontRightWheel_lon', 'rearLeftWheel_lat', 'rearLeftWheel_lon',
+            'rearRightWheel_lat', 'rearRightWheel_lon', 'cam_lat', 'cam_lon',
+            'topRight_frame_lat', 'topRight_frame_lon', 'topLeft_frame_lat', 'topLeft_frame_lon',
+            'bottomRight_frame_lat', 'bottomRight_frame_lon', 'bottomLeft_frame_lat', 'bottomLeft_frame_lon'])
+
+        nov_data: 
+        row = [
+                t, lat, lon, pointer_lat, pointer_lon,
+                ouster_lat, ouster_lon,
+                wheel_coords['frontLeft'][0], wheel_coords['frontLeft'][1],
+                wheel_coords['frontRight'][0], wheel_coords['frontRight'][1],
+                wheel_coords['rearLeft'][0], wheel_coords['rearLeft'][1],
+                wheel_coords['rearRight'][0], wheel_coords['rearRight'][1],
+                left_frame_coords['topRight'][0], left_frame_coords['topRight'][1],
+                left_frame_coords['topLeft'][0], left_frame_coords['topLeft'][1],
+                left_frame_coords['bottomRight'][0], left_frame_coords['bottomRight'][1],
+                left_frame_coords['bottomLeft'][0], left_frame_coords['bottomLeft'][1],
+                cam_lat, cam_lon,
+                right_frame_coords['topRight'][0], right_frame_coords['topRight'][1],
+                right_frame_coords['topLeft'][0], right_frame_coords['topLeft'][1],
+                right_frame_coords['bottomRight'][0], right_frame_coords['bottomRight'][1],
+                right_frame_coords['bottomLeft'][0], right_frame_coords['bottomLeft'][1],
+                cam1_lat, cam1_lon
+            ]
+    ''' 
+
+    def debug_no_frames(self, t, scaled_cov, center):
+        fig, ax = plt.subplots(figsize=(6, 6))
+
+        all_may_corners = self.may_data[:,17:25]
+        may_polys = create_polygons(all_may_corners)
+
+        for i,poly in enumerate(may_polys):
+            if not poly.is_valid or poly.is_empty:
+                print(f"[WARN] Skipping invalid polygon {i}")
+                continue
+            if not self.may_frame_area:
+                self.may_frame_area = poly.area 
+            else: 
+                if np.abs(self.may_frame_area - poly.area) / self.may_frame_area > 0.015:
+                    poly = fix_polygon_area(poly,self.may_frame_area) 
+            x, y = poly.exterior.xy
+            #print(f"poly center: {poly.centroid.x}, {poly.centroid.y}")
+            ax.plot(y,x, color="blue", linewidth=1, alpha=0.25)
+
+        left_nov_corners = self.nov_data[:,15:23]
+        right_nov_corners = self.nov_data[:,25:33]
+
+        left_polys = create_polygons(left_nov_corners)
+        #print("there are {} left polys".format(len(left_polys)))
+        right_polys = create_polygons(right_nov_corners) 
+        #print("there are {} right polys".format(len(right_polys))) 
+
+        for i,poly in enumerate(left_polys):
+            if not poly.is_valid or poly.is_empty:
+                print(f"[WARN] Skipping invalid polygon {i}")
+                continue
+            if not self.nov_frame_area:
+                self.nov_frame_area = poly.area 
+            else: 
+                if np.abs(self.nov_frame_area - poly.area) / self.nov_frame_area > 0.015:
+                    poly = fix_polygon_area(poly,self.nov_frame_area) 
+            x, y = poly.exterior.xy
+            #print(f"poly center: {poly.centroid.x}, {poly.centroid.y}")
+            ax.plot(y,x, color="red", linewidth=1, alpha=0.25)
+
+        for i,poly in enumerate(right_polys):
+            if not poly.is_valid or poly.is_empty:
+                print(f"[WARN] Skipping invalid polygon {i}")
+                continue
+            if not self.nov_frame_area:
+                self.nov_frame_area = poly.area 
+            else: 
+                if np.abs(self.nov_frame_area - poly.area) / self.nov_frame_area > 0.015:
+                    poly = fix_polygon_area(poly,self.nov_frame_area) 
+            x, y = poly.exterior.xy
+            #print(f"poly center: {poly.centroid.x}, {poly.centroid.y}")
+            ax.plot(y, x, color="orange", linewidth=1, alpha=0.25) 
+
+        idx = find_closest_index(self.may_compass_headings[:,0], t, max_delta_t=0.4)
+        compass_heading = self.may_compass_headings[idx,1] 
+  
+        ax.scatter(center[0],center[1],color='k',marker="*")
+
+        vals, vecs = np.linalg.eigh(scaled_cov) 
+        order = vals.argsort()[::-1]
+        vals = vals[order]
+        vecs = vecs[:, order]
+        # Calculate angle of ellipse rotation (in degrees)
+        theta = np.degrees(np.arctan2(*vecs[:, 0][::-1]))
+
+        # Width and height of the ellipse (2*stddevs)
+        width, height = 2 * np.sqrt(vals)
+
+        ellipse = Ellipse(xy=center, width=width, height=height, angle=theta, edgecolor='blue', facecolor='none')
+        ax.add_patch(ellipse) 
+
+        output_dir = "./no_frames"
+        if not os.path.exists("./no_frames"):
+            os.makedirs("./no_frames",exist_ok=True) 
+            
+        output_path = os.path.join(output_dir, str(t) + "-no_frames.png")
+        print("output_path: ",output_path) 
+        plt.savefig(output_path, dpi=300, bbox_inches="tight",pad_inches=0.2)
+        plt.close(fig)
 
     def cluster_polygons_plot(self, cov, center, frames): 
         fig, ax = plt.subplots(figsize=(6, 6))  # square aspect ratio
@@ -285,21 +390,7 @@ class seasonalComparer:
         for frame in may_frames: 
             may_corners.append(gps_lookup(frame))
         may_polys = create_polygons(may_corners)
-        print("Plotting may frames ...")
-        '''
-        for poly in may_polys:
-            if not poly.is_valid or poly.is_empty:
-                print(f"[WARN] Skipping invalid polygon {i}")
-                continue
-            if not self.may_frame_area:
-                self.may_frame_area = poly.area 
-            else: 
-                if np.abs(self.may_frame_area - poly.area) / self.may_frame_area > 0.015:
-                    poly = fix_polygon_area(poly,self.may_frame_area) 
-            x, y = poly.exterior.xy
-            ax.plot(x, y, color="blue", linewidth=1)
-        '''
-        
+
         # Cluster and assign colors
         clusters = cluster_overlapping_polygons(may_polys)
         cmap = cm.get_cmap('tab10', len(clusters))  # or 'Set3', 'tab20', etc.
@@ -317,22 +408,6 @@ class seasonalComparer:
         for frame in left_frames + right_frames: 
             nov_corners.append(gps_lookup(frame))
         nov_polys = create_polygons(nov_corners)
-        print("Plotting nov frames ...")
-
-        '''
-        for poly in nov_polys:
-            if not poly.is_valid or poly.is_empty:
-                print(f"[WARN] Skipping invalid polygon {i}")
-                continue
-            if not self.nov_frame_area:
-                self.nov_frame_area = poly.area 
-            else: 
-                if np.abs(self.nov_frame_area - poly.area) / self.nov_frame_area > 0.015:
-                    print(type(poly))
-                    poly = fix_polygon_area(poly,self.nov_frame_area) 
-            x, y = poly.exterior.xy
-            ax.plot(x, y, color="red", linewidth=1)
-        '''
 
         clusters = cluster_overlapping_polygons(nov_polys)
         cmap = cm.get_cmap('tab10', len(clusters))  # or 'Set3', 'tab20', etc.
@@ -428,10 +503,10 @@ class seasonalComparer:
         for frame in may_frames: 
             may_corners.append(gps_lookup(frame))
         may_polys = create_polygons(may_corners)
-        print("Plotting may frames ...")
+  
         for poly in may_polys:
             if not poly.is_valid or poly.is_empty:
-                print(f"[WARN] Skipping invalid polygon {i}")
+                print(f"[WARN] Skipping invalid polygon")
                 continue
             if not self.may_frame_area:
                 self.may_frame_area = poly.area 
@@ -446,10 +521,10 @@ class seasonalComparer:
         for frame in left_frames + right_frames: 
             nov_corners.append(gps_lookup(frame))
         nov_polys = create_polygons(nov_corners)
-        print("Plotting nov frames ...")
+        
         for poly in nov_polys:
             if not poly.is_valid or poly.is_empty:
-                print(f"[WARN] Skipping invalid polygon {i}")
+                print(f"[WARN] Skipping invalid polygon")
                 continue
             if not self.nov_frame_area:
                 self.nov_frame_area = poly.area 
@@ -516,6 +591,14 @@ class seasonalComparer:
     def process_timestamp(self,i,timestamp):
         print(f"\n[{i+1}/{len(self.may_cov_timestamps)}] Processing timestamp {timestamp}")
 
+        #output_path = os.path.join(self.paths["match_output_dir"], "overlapping_frames" + str(int(timestamp*10**9)) + "_" + str(max_filename_no + 1) + ".png")  
+
+        if os.path.exists(self.paths["match_output_dir"]):
+            processed_timestamps = [x for x in os.listdir(self.paths["match_output_dir"]) if "overlapping_frames" + str(int(timestamp*10**9)) in x]
+            if len(processed_timestamps) > 0:
+                print("this timestamp was already processed ...")
+                return 
+
         cov_matrix = load_covariance_matrix(self.may_cov_dir, self.may_cov_timestamps, timestamp)
         if cov_matrix is None:
             print("[WARN] No matching covariance for this timestamp.")
@@ -525,9 +608,9 @@ class seasonalComparer:
         i_may = find_closest_index(self.may_timestamps, timestamp, max_delta_t=0.3)
         center = (self.cam_lon[i_may], self.cam_lat[i_may])
 
-        #print("this is center: ",center)
-        frames = self.get_frames(scaled_cov,center) 
+        frames = self.get_frames(timestamp,scaled_cov,center) 
         if not frames:
+            print("no frames ... returning")
             return 
 
         may_frames = frames['may_frames']
@@ -537,7 +620,6 @@ class seasonalComparer:
         nov_front_frames = frames['nov_front_frames']
 
         output_dir_timestamp = os.path.join(self.paths["match_output_dir"],  str(int(timestamp * 10**9)))
-        #print("output_dir_timestamp: ",output_dir_timestamp)
 
         os.makedirs(output_dir_timestamp, exist_ok=True)
         may_fused_img_dir = os.path.join(output_dir_timestamp, "May")
@@ -545,17 +627,26 @@ class seasonalComparer:
         os.makedirs(may_fused_img_dir, exist_ok=True)
         os.makedirs(nov_fused_img_dir, exist_ok=True) 
 
-        self.stitch_front_imgs(timestamp, output_dir_timestamp, may_front_frames, nov_front_frames) 
+        #TO DO: only call if the headings are somewhat aligned 
+        may_heading = get_heading(timestamp, self.may_compass_headings)
+        nov_tsteps = [int(os.path.splitext(os.path.basename(path))[0]) for path in left_frames] 
+        nov_headings_rad = np.deg2rad([get_heading(t,self.nov_compass_headings) for t in nov_tsteps]) 
+        nov_heading = np.rad2deg(circmean(nov_headings_rad))
+ 
+        ang_diff = lambda x,y : np.abs(((x-y) + 180) % 360 - 180) 
+        if ang_diff(may_heading,nov_heading) < 15:
+            print("stitching front images!!")
+            self.stitch_front_imgs(timestamp, output_dir_timestamp, may_front_frames, nov_front_frames) 
 
         may_polys = []
         for frame in may_frames: 
-            #may_corners.append(gps_lookup(frame))
             frame_i  = frameInstance(frame)
             may_corners = gps_lookup(frame) 
             frame_i.polygon_obj = create_polygon(may_corners)
             may_polys.append(frame_i) 
         
         clusters = cluster_overlapping_frame_instances(may_polys) 
+
         for i,cluster in enumerate(clusters):
             stitch_clusters(
                     i,
@@ -575,6 +666,8 @@ class seasonalComparer:
             nov_polys.append(frame_i) 
         
         clusters = cluster_overlapping_frame_instances(nov_polys) 
+      
+
         for i,cluster in enumerate(clusters):
             stitch_clusters(
                     i,
@@ -583,16 +676,15 @@ class seasonalComparer:
                     self.nov_compass_headings,
                     self.stitch_cfg, 
                     prefix="nov"
-                )
+                )        
 
-        if hasattr(self, "front_stitch_thread"):
+        if hasattr(self, "front_stitch_thread") and self.front_stitch_thread is not None:
             try:
                 self.front_stitch_thread.join()
             except Exception as e:
                 print(f"[ERROR] Failed to join front stitching thread: {e}")
 
         self.visualize_overlapping_frames(timestamp, output_dir_timestamp,may_fused_img_dir,nov_fused_img_dir)
-        input("Hol Up") 
 
     def visualize_overlapping_frames(self,timestamp,output_dir_timestamp,may_dir,nov_dir):
         cov_matrix = load_covariance_matrix(self.may_cov_dir, self.may_cov_timestamps, timestamp)
@@ -628,8 +720,20 @@ class seasonalComparer:
                         intersecting_frames = find_intersecting_clusters(may_pano_dict[fused_may_path],nov_pano_dict[fused_nov_path]) 
                         #this is a list of tuples such that if (0,1) then A0 intersects with B1  
                         if not intersecting_frames:
-                            return
-                        
+                            print("no intersecting frames ...")
+                            continue 
+
+                        if not os.path.exists(fused_may_path) or not os.path.exists(fused_nov_path):
+                            print("no fused img path ...")
+                            continue 
+                            
+                        p = Path(self.paths["stitch_img_pairs_path"])
+                        p.parent.mkdir(parents=True, exist_ok=True)
+                
+                        with p.open("a") as f:
+                            #print(f"{fused_may_path} {fused_nov_path}\n")
+                            f.write(f"{fused_may_path} {fused_nov_path}\n")
+
                         fig = plt.figure(figsize=(15, 5))  # Wider figure
                         gs = gridspec.GridSpec(1, 3, width_ratios=[1, 1, 1])  # 3 columns
                         # ----- Left: May fused image -----
@@ -680,7 +784,7 @@ class seasonalComparer:
                             xy=center,
                             width=width,
                             height=height,
-                            angle=theta,
+                            angle=90-theta,
                             edgecolor='blue',
                             facecolor='none',
                             linestyle='dotted'  # or use '--' for dashed
@@ -697,25 +801,6 @@ class seasonalComparer:
                         nov_fused = mpatches.Patch(facecolor='red', alpha=0.25, label='Nov Fused Area')
                         ellipse_handle = mlines.Line2D([], [], color='blue', linestyle='dotted', label='May Frame Covariance Ellipse')
 
-                        """
-                        may_merged_polygon = unary_union(may_pano_dict[fused_may_path])
-                        nov_merged_polygon = unary_union(nov_pano_dict[fused_nov_path]) 
-
-                        # Find the bounding box of both fused polygons
-                        may_bounds = may_merged_polygon.bounds  # (minx, miny, maxx, maxy)
-                        nov_bounds = nov_merged_polygon.bounds  # (minx, miny, maxx, maxy)
-
-                        # Merge the bounds
-                        min_lon = min(may_bounds[0], nov_bounds[0])
-                        min_lat = min(may_bounds[1], nov_bounds[1])
-                        max_lon = max(may_bounds[2], nov_bounds[2])
-                        max_lat = max(may_bounds[3], nov_bounds[3])
-
-                        # Set axis limits
-                        ax1.set_xlim(min_lon, max_lon)
-                        ax1.set_ylim(min_lat, max_lat)
-                        """ 
-
                         ax1.legend(
                             #may_outline, nov_left_outline, nov_right_outline, 
                             handles=[may_fused, nov_fused, ellipse_handle],
@@ -728,10 +813,20 @@ class seasonalComparer:
 
                         plt.tight_layout(rect=[0, 0, 1, 0.95])  
                         output_path = os.path.join(self.paths["match_output_dir"], f"overlapping_frames" + str(int(timestamp*10**9)) + ".png")
+                        if os.path.exists(output_path):
+                            if os.path.exists(os.path.join(self.paths["match_output_dir"], f"overlapping_frames" + str(int(timestamp*10**9)) + "_0.png")):
+                                timestamp_filenames = [x for x in os.listdir(self.paths["match_output_dir"]) if str(int(timestamp*10**9)) in x]
+                                max_filename_no = 0
+                                for filename in timestamp_filenames:
+                                    idx = [i for i,x in enumerate(filename) if x == "_"][1]
+                                    filename_no = int(filename[idx+1:-4]) 
+                                    max_filename_no = max(filename_no,max_filename_no) 
+                                output_path = os.path.join(self.paths["match_output_dir"], f"overlapping_frames" + str(int(timestamp*10**9)) + "_" + str(max_filename_no + 1) + ".png") 
+                            else:
+                                output_path = os.path.join(self.paths["match_output_dir"], f"overlapping_frames" + str(int(timestamp*10**9)) + "_0.png") 
+
                         print(f"Writing {output_path}")
                         plt.savefig(output_path)
-                        input("Check plot") 
-
                         fig.clf()
                         plt.close(fig)
                         gc.collect()

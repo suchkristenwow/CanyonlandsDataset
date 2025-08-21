@@ -7,6 +7,7 @@ may_front_images = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/May
 nov_left_images = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/Nov2022_2conmod/2conmod/Left_Down_Facing_Images"
 nov_right_images = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/Nov2022_2conmod/2conmod/Right_Down_Facing_Images"
 nov_front_images = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/Nov2022_2conmod/2conmod/Front_Facing_Images"
+stitch_img_pairs_path = "/media/kristen/easystore3/RestorebotData/benchmarking_ex/2conmod_stitched_pairs.txt" 
 [stitching]
 crop = false
 confidence_threshold = 0.5

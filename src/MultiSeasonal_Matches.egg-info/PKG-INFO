@@ -1,0 +1,18 @@
+Metadata-Version: 2.4
+Name: MultiSeasonal_Matches
+Version: 0.1.0
+Summary: Tools for aligning and stitching multi-season camera images
+Author: Kristen Such
+Requires-Python: >=3.7
+Requires-Dist: opencv-python
+Requires-Dist: shapely
+Requires-Dist: matplotlib
+Requires-Dist: geographiclib
+Requires-Dist: geopy
+Requires-Dist: psutil
+Requires-Dist: PyYAML
+Requires-Dist: scipy
+Requires-Dist: tqdm
+Requires-Dist: toml
+Requires-Dist: stitching
+Requires-Dist: py3rosmsgs

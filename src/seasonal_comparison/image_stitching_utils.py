@@ -4,7 +4,6 @@
 Utilities for frame chunking, GPS corner extraction, and image cropping
 for seasonal frame stitching.
 """
-
 import os
 import numpy as np
 import cv2 as cv
@@ -12,14 +11,18 @@ from shapely.geometry import Polygon
 from seasonal_comparison.general_utils import robust_load_csv, log_mem
 import pickle 
 import subprocess 
+import uuid  
 
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use(os.environ.get("MPLBACKEND", "Agg"))
 import matplotlib.pyplot as plt
 plt.ioff() 
 
 from geopy.distance import geodesic
-
+from scipy.stats import circmean 
+import tempfile
+import math 
+from pathlib import Path
 
 def fix_fourth_corner_area_match(three_corners, desired_area):
     """
@@ -120,21 +123,57 @@ def fix_polygon_area(poly, desired_area, tol=0.1):
 
     return best_poly
 
-def call_stitch_subprocess(frame_list, stitch_cfg):
-    import tempfile
-    import uuid
 
+def call_stitch_subprocess(frame_list, stitch_cfg, timeout_sec=60):
+    
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pkl") as f:
         data_path = f.name
         pickle.dump({"frame_list": frame_list, "stitch_cfg": stitch_cfg}, f)
 
     output_path = f"/tmp/stitched_{uuid.uuid4().hex}.png"
 
-    subprocess.run(["python3", "src/seasonal_comparison/img_stitch_worker.py", data_path, output_path], check=True)
+    env = os.environ.copy()
+    # Cap hidden thread fans that blow up RAM
+    env.setdefault("OMP_NUM_THREADS","1")
+    env.setdefault("OPENBLAS_NUM_THREADS","1")
+    env.setdefault("MKL_NUM_THREADS","1")
+    env.setdefault("NUMEXPR_NUM_THREADS","1")
+    env.setdefault("OPENCV_OPENCL_RUNTIME","disabled")
 
-    stitched_img = cv.imread(output_path)
+    # IMPORTANT: check=False and capture outputs for logging
+    try:
+        res = subprocess.run(
+            ["python3", "src/seasonal_comparison/img_stitch_worker.py", data_path, output_path],
+            check=False, env=env, capture_output=True, text=True, timeout=timeout_sec
+        )
+    except subprocess.TimeoutExpired:
+        print("[WARN] stitch subprocess timed out")
+        try: os.remove(data_path)
+        except OSError: pass
+        return None
+    finally:
+        # clean the pickle, it's not needed after the subprocess starts
+        try: os.remove(data_path)
+        except OSError: pass
 
-    return stitched_img 
+    if res.returncode != 0:
+        # Non-zero means stitch failed (e.g., no matches). Just log and skip.
+        if res.stdout: print("[stitch stdout]\n" + res.stdout.strip())
+        if res.stderr: print("[stitch stderr]\n" + res.stderr.strip())
+        try: 
+            if os.path.exists(output_path): os.remove(output_path)
+        except OSError:
+            pass
+        return None
+
+    if os.path.exists(output_path):
+        stitched_img = cv.imread(output_path)
+        # optionally remove file after reading
+        try: os.remove(output_path)
+        except OSError: pass
+        return stitched_img
+
+    return None
 
 def fix_fourth_corner(corners, tol=1e-8):
     """
@@ -263,7 +302,7 @@ def reorder_corners(corner_tuples):
     [top-left, top-right, bottom-right, bottom-left]
     """
     pts = np.array(corner_tuples)
-
+    pts = pts.reshape((4,2))
     # Sort by latitude (lat = y)
     sorted_by_lat = pts[np.argsort(pts[:, 1])]
     top_two = sorted_by_lat[-2:]
@@ -282,25 +321,21 @@ def reorder_corners(corner_tuples):
 
 def stitch_and_rotate_north(frames_to_stitch,stitch_cfg,output_path, processed_compass_headings):
     if not check_image_sizes(frames_to_stitch):
-        raise OSError 
+        raise OSError
 
+    stitched_img = None
     try:
-        #stitched_img = stitcher.stitch(chunk)
-        stitched_img = call_stitch_subprocess(frames_to_stitch,stitch_cfg)
+        stitched_img = call_stitch_subprocess(frames_to_stitch, stitch_cfg)
         if stitched_img is None:
             print("stitched_img is None ... moving on")
-            return 
+            return  # gracefully skip
+
         stitched_img = crop_connected_region(stitched_img)
     except Exception as e:
         print(f"Image stitching failed: {e}")
-        if stitched_img:
-            del stitched_img 
-        return 
-    
-    avg_heading = np.mean([
-        get_heading(int(os.path.splitext(os.path.basename(path))[0]), processed_compass_headings)
-        for path in frames_to_stitch
-    ])
+        if stitched_img is not None:
+            del stitched_img
+        return
 
     # Extract timestamps from filenames
     timestamps = [
@@ -313,7 +348,8 @@ def stitch_and_rotate_north(frames_to_stitch,stitch_cfg,output_path, processed_c
     ])
 
     headings_rad = np.deg2rad(headings) 
-
+    avg_heading = np.rad2deg(circmean(headings_rad))
+ 
     # Compute mean using circular statistics
     mean_sin = np.mean(np.sin(headings_rad))
     mean_cos = np.mean(np.cos(headings_rad))
@@ -351,33 +387,77 @@ def get_pano_path(output_dir):
     last_pano_num = max(filename_nums)
     return os.path.join(output_dir,str(last_pano_num + 1)+".png")
 
-def stitch_clusters(cluster_idx,frame_list,output_dir,processed_compass_headings,stitch_cfg,prefix):
-    panos = {} 
+def _as_paths(items):
+    """Accept list of strings or frameInstance objects."""
+    out = []
+    for it in items:
+        out.append(it.frame_path if hasattr(it, "frame_path") else it)
+    return out
 
-    if len(frame_list) > 5:
-        chunks = chunk_filenames(frame_list)
-        for chunk in chunks:
-            #chunk_path = os.path.join(output_dir, f"{fused_img_count}.png")
-            chunk_path = get_pano_path(output_dir)
-            stitch_and_rotate_north(chunk,stitch_cfg,chunk_path,processed_compass_headings) 
-            fused_corners = [gps_lookup(path) for path in chunk]
-            polygons = [create_polygon(corners) for corners in fused_corners]
-            panos[chunk_path] = polygons
-    else:
-        chunk_path = get_pano_path(output_dir)
-        stitch_and_rotate_north(frame_list,stitch_cfg,chunk_path,processed_compass_headings)  
-        fused_corners = [gps_lookup(path) for path in frame_list] 
-        polygons = [create_polygon(corners) for corners in fused_corners]
-        panos[chunk_path] = polygons
-    
-    pickle_path = os.path.join(output_dir, f"{prefix}_panos_" + str(cluster_idx) +".pickle")
+def _safe_polygons(paths):
+    polys = []
+    for p in paths:
+        corners = gps_lookup(p)
+        if corners is None:
+            continue
+        try:
+            poly = create_polygon(corners)
+        except Exception as e:
+            print(f"[WARN] create_polygon failed for {p}: {e}")
+            continue
+        if poly is None or getattr(poly, "is_empty", False):
+            continue
+        polys.append(poly)
+    return polys
 
-    for path in panos:
-        if isinstance(panos[path][0],list):
-            print("this should be polygon object.")
-            raise OSError 
-    
+def _pano_path(output_dir, prefix, cluster_idx, part_idx):
+    # Make the filename deterministic & unique per cluster/part
+    return os.path.join(
+        output_dir,
+        f"{prefix}_cluster{int(cluster_idx):04d}_part{int(part_idx):02d}.png"
+    )
+
+def stitch_clusters(cluster_idx, frame_list, output_dir,
+                    processed_compass_headings, stitch_cfg, prefix):
+    """
+    Create one or more stitched panos for a cluster and
+    return { pano_path: [Polygon, ...], ... } and write a pickle.
+    """
+    #print("entered stitch clusters...")
+    os.makedirs(output_dir, exist_ok=True)
+
+    paths = _as_paths(frame_list)
+
+    # Chunks: keep the original behavior (chunk only if many frames)
+    chunks = chunk_filenames(paths) if len(paths) > 5 else [paths]
+
+    panos = {}
+    for part_idx, chunk in enumerate(chunks):
+        #print("chunk:",chunk)
+        pano_path = _pano_path(output_dir, prefix, cluster_idx, part_idx)
+
+        # Choose your stitcher; if you don't have rotate-north, fall back.
+        stitch_and_rotate_north(chunk, stitch_cfg, pano_path, processed_compass_headings) 
+        #print("stitched and rotated successfuly!") 
+
+        polygons = _safe_polygons(chunk)
+        if not polygons:
+            print(f"[WARN] No valid polygons for {pano_path}; skipping key.")
+            continue
+        panos[pano_path] = polygons
+
+    # Sanity check: ensure elements are shapely Polygons
+    for k, v in panos.items():
+        if not v:
+            print(f"[WARN] Empty polygon list for {k}.")
+            continue
+        if isinstance(v[0], list):
+            raise TypeError(f"Expected shapely Polygons, got list for key {k}")
+
+    # Persist pickle once per cluster
+    pickle_path = os.path.join(output_dir, f"{prefix}_panos_{cluster_idx}.pickle")
     with open(pickle_path, "wb") as handle:
+        #print("writing:", pickle_path)
         pickle.dump(panos, handle)
 
     return panos
@@ -476,16 +556,26 @@ def stitch_and_save(frame_list, output_dir, processed_compass_headings, stitch_c
 def get_heading(timestamp, compass_data):    
     timestamps = compass_data[:, 0]
     headings_deg = compass_data[:, 1]
-    idx = np.abs(timestamps - timestamp*10**(-9)).argmin()
-    if np.abs(timestamps[idx] - timestamp*10**(-9)) > 0.3:
-        print("no valid heading found!")
-        print(timestamps[0])
-        print(timestamp*10**(-9))
-        print("timestamp: ",timestamp)
-        print(np.abs(timestamps - timestamp*10**(-9)))
-        raise OSError 
+    if math.floor(math.log10(abs(timestamp))) > math.floor(math.log10(abs(timestamps[0]))):
+        idx = np.abs(timestamps - timestamp*10**(-9)).argmin()
+        if np.abs(timestamps[idx] - timestamp*10**(-9)) > 0.3:
+            print("no valid heading found!")
+            print(timestamps[0])
+            print(timestamp*10**(-9))
+            print("timestamp: ",timestamp)
+            print(np.abs(timestamps - timestamp*10**(-9)))
+            raise OSError 
+    elif math.floor(math.log10(abs(timestamp))) == math.floor(math.log10(abs(timestamps[0]))):
+        idx = np.abs(timestamps - timestamp).argmin() 
+        if np.abs(timestamps[idx] - timestamp) > 0.3:
+            print("no valid heading found!")
+            print(timestamps[0])
+            print(timestamp*10**(-9))
+            print("timestamp: ",timestamp)
+            print(np.abs(timestamps - timestamp*10**(-9)))
+            raise OSError 
+    
     return headings_deg[idx]
-
 
 def rotate_image_north(image, heading_deg):
     center = tuple(np.array(image.shape[1::-1]) / 2)

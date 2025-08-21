@@ -1,6 +1,6 @@
 from shapely.strtree import STRtree
 import networkx as nx
-from image_stitching_utils import create_polygon 
+from seasonal_comparison.image_stitching_utils import create_polygon 
 
 def cluster_overlapping_polygons(polygons, min_overlap_area=0.0):
     valid_polygons = [p for p in polygons if p.is_valid and not p.is_empty]

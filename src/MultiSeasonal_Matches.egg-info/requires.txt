@@ -1,0 +1,12 @@
+opencv-python
+shapely
+matplotlib
+geographiclib
+geopy
+psutil
+PyYAML
+scipy
+tqdm
+toml
+stitching
+py3rosmsgs

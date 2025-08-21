@@ -1,3 +1,4 @@
+# src/seasonal_comparison/img_stitch_worker.py
 import sys
 import pickle
 import cv2 as cv
@@ -11,13 +12,13 @@ def main(pickle_path, output_path):
     stitch_cfg = data["stitch_cfg"]
 
     stitcher = AffineStitcher(crop=False, confidence_threshold=stitch_cfg["confidence_threshold"])
-    try: 
+    try:
         stitched_img = stitcher.stitch(frame_list)
     except Exception as e:
         print(f"[ERROR] Stitching failure: {e}")
-        return 
+        sys.exit(2)  # <-- non-zero exit to signal failure to parent
 
-    #print(f"[INFO] Writing stitched image to {output_path}")
+    print(f"[INFO] Writing stitched image to {output_path}")
     cv.imwrite(output_path, stitched_img)
 
 if __name__ == '__main__':
