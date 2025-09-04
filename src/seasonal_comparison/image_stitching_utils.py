@@ -212,16 +212,21 @@ def create_polygons(corners_list, debug_dir="./debug_polygon_plots"):
     polygons = []
 
     for idx, corners in enumerate(corners_list):
-        if not check_corner_uniqueness(corners):
-            print("[ERROR] Invalid frame corners:",corners)
-            raise OSError 
+ 
+        if isinstance(corners,Polygon):
+            poly = corners 
+        else:
+            if not check_corner_uniqueness(corners):
+                print("[ERROR] Invalid frame corners:",corners)
+                raise OSError 
 
-        try:
-            corners = reorder_corners(corners)
-        except Exception as e:
-            print(f"[WARN] Failed to reorder corners: {corners} ({e})")
+            try:
+                corners = reorder_corners(corners)
+            except Exception as e:
+                print(f"[WARN] Failed to reorder corners: {corners} ({e})")
 
-        poly = Polygon(corners)
+            poly = Polygon(corners)
+
         if poly.is_valid and not poly.is_empty and poly.area > 0:
             polygons.append(poly)
         else:
@@ -301,6 +306,12 @@ def reorder_corners(corner_tuples):
     Reorder 4 (lon, lat) corner points into consistent order:
     [top-left, top-right, bottom-right, bottom-left]
     """
+    if not isinstance(corner_tuples[0],tuple):
+        print("This should be list of tuples :(")
+        print(corner_tuples)
+        print(type(corner_tuples))
+        raise OSError 
+
     pts = np.array(corner_tuples)
     pts = pts.reshape((4,2))
     # Sort by latitude (lat = y)
@@ -632,6 +643,9 @@ def check_corner_uniqueness(corners, tol=1e-7):
     Returns:
         (bool, str): (is_valid, reason_for_failure or 'OK')
     """
+    if isinstance(corners,Polygon):
+        corners = corners.exterior.coords 
+
     if len(corners) != 4:
         return False, "Expected 4 corners"
 

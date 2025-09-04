@@ -7,14 +7,24 @@ def gradient_mag(gray):
     gy = cv.Sobel(gray, cv.CV_32F, 0, 1, ksize=3)
     return cv.magnitude(gx, gy)
 
-def sift_pair_score(imgA, imgB):
+def pair_score(imgA, imgB, type_="sift"):
     # 1) keypoints + matches
-    sift = cv.SIFT_create()                 # OR: cv.ORB_create(nfeatures=2000)
-    kA, dA = sift.detectAndCompute(imgA, None)
-    kB, dB = sift.detectAndCompute(imgB, None)
+    if type_ == "sift":
+        sift = cv.SIFT_create()                
+        kA, dA = sift.detectAndCompute(imgA, None)
+        kB, dB = sift.detectAndCompute(imgB, None) 
+    elif type_ == "orb":
+        orb = cv.ORB_create(nfeatures=2000)
+        kA, dA = orb.detectAndCompute(imgA, None)
+        kB, dB = orb.detectAndCompute(imgB, None) 
+
     if dA is None or dB is None: return None
 
-    matcher = cv.BFMatcher(cv.NORM_L2)      # NORM_HAMMING if ORB
+    if type_ == "sift":
+        matcher = cv.BFMatcher(cv.NORM_L2)      
+    elif type_ == "orb":
+        matcher = cv.BFMatcher(cv.NORM_HAMMING)   
+
     raw = matcher.knnMatch(dA, dB, k=2)
     good = [m for m,n in raw if m.distance < 0.75*n.distance]
     if len(good) < 8: return None

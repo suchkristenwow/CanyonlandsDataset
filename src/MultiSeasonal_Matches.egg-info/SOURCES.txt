@@ -6,8 +6,10 @@ src/MultiSeasonal_Matches.egg-info/dependency_links.txt
 src/MultiSeasonal_Matches.egg-info/requires.txt
 src/MultiSeasonal_Matches.egg-info/top_level.txt
 src/seasonal_comparison/__init__.py
+src/seasonal_comparison/analyze_hloc_matches.py
 src/seasonal_comparison/general_utils.py
 src/seasonal_comparison/geometry_utils.py
+src/seasonal_comparison/global_shape_index.py
 src/seasonal_comparison/gps_utils.py
 src/seasonal_comparison/image_similarity.py
 src/seasonal_comparison/image_stitching_utils.py
@@ -15,4 +17,7 @@ src/seasonal_comparison/img_stitch_worker.py
 src/seasonal_comparison/llm_utils.py
 src/seasonal_comparison/plot_figs.py
 src/seasonal_comparison/process_timestamp_batch.py
+src/seasonal_comparison/query_best_match.py
+src/seasonal_comparison/shape_match_retrieval.py
 src/seasonal_comparison/timestamp_batch_worker.py
+src/seasonal_comparison/wider_shape_retrieval.py
