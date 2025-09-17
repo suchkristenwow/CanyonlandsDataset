@@ -1,0 +1,54 @@
+[INFO] Processing batch 1
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpzmqex41f.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824650.014668
+
+[1/4721] Processing timestamp 1650824650.014668
+WARN: These are not the same order of magnitude ... trying to correct
+closest_timestamp:  1650824650014667987
+timestamp: 1.650824650014668e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+This should be list of tuples :(
+[  38.06604903 -109.3608032    38.06604827 -109.36080345   38.0660493
+ -109.3608045    38.06604852 -109.36080474]
+<class 'numpy.ndarray'>
+[WARN] Failed to reorder corners: [  38.06604903 -109.3608032    38.06604827 -109.36080345   38.0660493
+ -109.3608045    38.06604852 -109.36080474] ()
+[ERR] timestamp 1650824650.014668 failed: linearrings: Input operand 0 does not have enough dimensions (has 1, gufunc core with signature (i, d),()->() requires 2)
+[WORKER] processing idx=1 ts=1650824650.214701
+
+[2/4721] Processing timestamp 1650824650.214701
+WARN: These are not the same order of magnitude ... trying to correct
+closest_timestamp:  1650824650214700937
+timestamp: 1.650824650214701e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+This should be list of tuples :(
+[  38.06604903 -109.3608032    38.06604827 -109.36080345   38.0660493
+ -109.3608045    38.06604852 -109.36080474]
+<class 'numpy.ndarray'>
+[WARN] Failed to reorder corners: [  38.06604903 -109.3608032    38.06604827 -109.36080345   38.0660493
+ -109.3608045    38.06604852 -109.36080474] ()
+[ERR] timestamp 1650824650.214701 failed: linearrings: Input operand 0 does not have enough dimensions (has 1, gufunc core with signature (i, d),()->() requires 2)
+[WORKER] processing idx=2 ts=1650824650.414594
+
+[3/4721] Processing timestamp 1650824650.414594
+WARN: These are not the same order of magnitude ... trying to correct
+closest_timestamp:  1650824650414593935
+timestamp: 1.650824650414594e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...

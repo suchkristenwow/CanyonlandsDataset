@@ -113,19 +113,19 @@ def load_covariance_matrix(covariance_dir, available_timestamps, timestamp, thre
     """
     
     if not same_order_of_magnitude(available_timestamps[0],timestamp):
-        print("WARN: These are not the same order of magnitude ... trying to correct")
+        #print("WARN: These are not the same order of magnitude ... trying to correct")
         tmp_timestamp = timestamp * 10**9 
         if same_order_of_magnitude(available_timestamps[0],tmp_timestamp):
             timestamp = timestamp * 10**9 
 
     closest_timestamp = min(available_timestamps, key=lambda t: abs(t - timestamp))
-    print("closest_timestamp: ",closest_timestamp) 
+    #print("closest_timestamp: ",closest_timestamp) 
 
     filename = os.path.join(covariance_dir, f"{closest_timestamp}.csv")
     if not os.path.exists(filename):
         raise FileNotFoundError(f"[ERROR] Covariance matrix file not found: {filename}")
 
-    print("timestamp:",timestamp) 
+    #print("timestamp:",timestamp) 
     
     #this should be converted into secs 
     if len(str(timestamp)) == 19 and len(str(closest_timestamp)) == 19:

@@ -1,0 +1,2255 @@
+[INFO] Processing batch 1
+[INFO] Memory: 0.05 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp4rrr6w91.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824650.014668
+
+[1/4721] Processing timestamp 1650824650.014668
+closest_timestamp:  1650824650014667987
+timestamp: 1.650824650014668e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824650.014668-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824650.014668
+[WORKER] processing idx=1 ts=1650824650.214701
+
+[2/4721] Processing timestamp 1650824650.214701
+closest_timestamp:  1650824650214700937
+timestamp: 1.650824650214701e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824650.214701-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824650.214701
+[WORKER] processing idx=2 ts=1650824650.414594
+
+[3/4721] Processing timestamp 1650824650.414594
+closest_timestamp:  1650824650414593935
+timestamp: 1.650824650414594e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824650.414594-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824650.414594
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 2
+[INFO] Memory: 0.05 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpahsxqatm.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824650.614639
+
+[1/4721] Processing timestamp 1650824650.614639
+closest_timestamp:  1650824650614639043
+timestamp: 1.650824650614639e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824650.614639-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824650.614639
+[WORKER] processing idx=1 ts=1650824650.814922
+
+[2/4721] Processing timestamp 1650824650.814922
+closest_timestamp:  1650824650814922094
+timestamp: 1.650824650814922e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824650.814922-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824650.814922
+[WORKER] processing idx=2 ts=1650824651.014658
+
+[3/4721] Processing timestamp 1650824651.014658
+closest_timestamp:  1650824651014657974
+timestamp: 1.650824651014658e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824651.014658-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824651.014658
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 3
+[INFO] Memory: 0.05 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp99kx9adf.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824651.214612
+
+[1/4721] Processing timestamp 1650824651.214612
+closest_timestamp:  1650824651214612007
+timestamp: 1.650824651214612e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824651.214612-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824651.214612
+[WORKER] processing idx=1 ts=1650824651.414604
+
+[2/4721] Processing timestamp 1650824651.414604
+closest_timestamp:  1650824651414603948
+timestamp: 1.650824651414604e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824651.414604-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824651.414604
+[WORKER] processing idx=2 ts=1650824651.614673
+
+[3/4721] Processing timestamp 1650824651.614673
+closest_timestamp:  1650824651614672899
+timestamp: 1.650824651614673e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824651.614673-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824651.614673
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 4
+[INFO] Memory: 0.05 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp2itz908r.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824651.814961
+
+[1/4721] Processing timestamp 1650824651.814961
+closest_timestamp:  1650824651814960956
+timestamp: 1.650824651814961e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824651.814961-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824651.814961
+[WORKER] processing idx=1 ts=1650824652.014602
+
+[2/4721] Processing timestamp 1650824652.014602
+closest_timestamp:  1650824652014601945
+timestamp: 1.650824652014602e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824652.014602-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824652.014602
+[WORKER] processing idx=2 ts=1650824652.214686
+
+[3/4721] Processing timestamp 1650824652.214686
+closest_timestamp:  1650824652214685916
+timestamp: 1.650824652214686e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824652.214686-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824652.214686
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 5
+[INFO] Memory: 0.05 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpgi4je1on.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824652.414679
+
+[1/4721] Processing timestamp 1650824652.414679
+closest_timestamp:  1650824652414679050
+timestamp: 1.650824652414679e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824652.414679-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824652.414679
+[WORKER] processing idx=1 ts=1650824652.614617
+
+[2/4721] Processing timestamp 1650824652.614617
+closest_timestamp:  1650824652614617109
+timestamp: 1.650824652614617e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824652.614617-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824652.614617
+[WORKER] processing idx=2 ts=1650824652.814965
+
+[3/4721] Processing timestamp 1650824652.814965
+closest_timestamp:  1650824652814965009
+timestamp: 1.650824652814965e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824652.814965-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824652.814965
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 6
+[INFO] Memory: 0.05 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpvho3kteo.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824653.014694
+
+[1/4721] Processing timestamp 1650824653.014694
+closest_timestamp:  1650824653014693975
+timestamp: 1.650824653014694e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824653.014694-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824653.014694
+[WORKER] processing idx=1 ts=1650824653.214588
+
+[2/4721] Processing timestamp 1650824653.214588
+closest_timestamp:  1650824653214587926
+timestamp: 1.650824653214588e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824653.214588-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824653.214588
+[WORKER] processing idx=2 ts=1650824653.414578
+
+[3/4721] Processing timestamp 1650824653.414578
+closest_timestamp:  1650824653414577960
+timestamp: 1.650824653414578e+18
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824653.414578-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824653.414578
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 7
+[INFO] Memory: 0.05 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpafho4m57.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824653.614586
+
+[1/4721] Processing timestamp 1650824653.614586
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824653.614586-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824653.614586
+[WORKER] processing idx=1 ts=1650824653.814921
+
+[2/4721] Processing timestamp 1650824653.814921
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824653.814921-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824653.814921
+[WORKER] processing idx=2 ts=1650824654.014599
+
+[3/4721] Processing timestamp 1650824654.014599
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824654.014599-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824654.014599
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 8
+[INFO] Memory: 0.05 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpdq2aehek.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824654.214689
+
+[1/4721] Processing timestamp 1650824654.214689
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824654.214689-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824654.214689
+[WORKER] processing idx=1 ts=1650824654.414609
+
+[2/4721] Processing timestamp 1650824654.414609
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824654.414609-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824654.414609
+[WORKER] processing idx=2 ts=1650824654.614668
+
+[3/4721] Processing timestamp 1650824654.614668
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824654.614668-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824654.614668
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 9
+[INFO] Memory: 0.05 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpye29gl3r.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824654.814907
+
+[1/4721] Processing timestamp 1650824654.814907
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824654.814907-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824654.814907
+[WORKER] processing idx=1 ts=1650824655.014649
+
+[2/4721] Processing timestamp 1650824655.014649
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824655.014649-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824655.014649
+[WORKER] processing idx=2 ts=1650824655.214596
+
+[3/4721] Processing timestamp 1650824655.214596
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824655.214596-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824655.214596
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 10
+[INFO] Memory: 0.05 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp2vg8szb9.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824655.414562
+
+[1/4721] Processing timestamp 1650824655.414562
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824655.414562-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824655.414562
+[WORKER] processing idx=1 ts=1650824655.614578
+
+[2/4721] Processing timestamp 1650824655.614578
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824655.614578-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824655.614578
+[WORKER] processing idx=2 ts=1650824655.8149
+
+[3/4721] Processing timestamp 1650824655.8149
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824655.8149-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824655.8149
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 11
+[INFO] Memory: 0.05 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpe_e5ahtb.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824656.014655
+
+[1/4721] Processing timestamp 1650824656.014655
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824656.014655-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824656.014655
+[WORKER] processing idx=1 ts=1650824656.214618
+
+[2/4721] Processing timestamp 1650824656.214618
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824656.214618-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824656.214618
+[WORKER] processing idx=2 ts=1650824656.414589
+
+[3/4721] Processing timestamp 1650824656.414589
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824656.414589-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824656.414589
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 12
+[INFO] Memory: 0.05 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp2h8c49db.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824656.614614
+
+[1/4721] Processing timestamp 1650824656.614614
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824656.614614-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824656.614614
+[WORKER] processing idx=1 ts=1650824656.814904
+
+[2/4721] Processing timestamp 1650824656.814904
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824656.814904-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824656.814904
+[WORKER] processing idx=2 ts=1650824657.014665
+
+[3/4721] Processing timestamp 1650824657.014665
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824657.014665-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824657.014665
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 13
+[INFO] Memory: 0.05 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp3st6skgk.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824657.214637
+
+[1/4721] Processing timestamp 1650824657.214637
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824657.214637-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824657.214637
+[WORKER] processing idx=1 ts=1650824657.414592
+
+[2/4721] Processing timestamp 1650824657.414592
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824657.414592-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824657.414592
+[WORKER] processing idx=2 ts=1650824657.614593
+
+[3/4721] Processing timestamp 1650824657.614593
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824657.614593-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824657.614593
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 14
+[INFO] Memory: 0.05 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp8r5p0t31.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824657.814809
+
+[1/4721] Processing timestamp 1650824657.814809
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824657.814809-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824657.814809
+[WORKER] processing idx=1 ts=1650824658.01457
+
+[2/4721] Processing timestamp 1650824658.01457
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824658.01457-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824658.01457
+[WORKER] processing idx=2 ts=1650824658.214519
+
+[3/4721] Processing timestamp 1650824658.214519
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824658.214519-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824658.214519
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 15
+[INFO] Memory: 0.05 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp0kurqzfa.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824658.414441
+
+[1/4721] Processing timestamp 1650824658.414441
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824658.414441-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824658.414441
+[WORKER] processing idx=1 ts=1650824658.614508
+
+[2/4721] Processing timestamp 1650824658.614508
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824658.614508-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824658.614508
+[WORKER] processing idx=2 ts=1650824658.814851
+
+[3/4721] Processing timestamp 1650824658.814851
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824658.814851-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824658.814851
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 16
+[INFO] Memory: 0.05 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmph2qjkc69.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824659.014519
+
+[1/4721] Processing timestamp 1650824659.014519
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824659.014519-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824659.014519
+[WORKER] processing idx=1 ts=1650824659.21444
+
+[2/4721] Processing timestamp 1650824659.21444
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824659.21444-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824659.21444
+[WORKER] processing idx=2 ts=1650824659.414521
+
+[3/4721] Processing timestamp 1650824659.414521
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824659.414521-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824659.414521
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 17
+[INFO] Memory: 0.05 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp3qica0r4.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824659.6145
+
+[1/4721] Processing timestamp 1650824659.6145
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824659.6145-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824659.6145
+[WORKER] processing idx=1 ts=1650824659.814776
+
+[2/4721] Processing timestamp 1650824659.814776
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824659.814776-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824659.814776
+[WORKER] processing idx=2 ts=1650824660.014551
+
+[3/4721] Processing timestamp 1650824660.014551
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824660.014551-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824660.014551
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 18
+[INFO] Memory: 0.05 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp1kzdduni.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824660.214371
+
+[1/4721] Processing timestamp 1650824660.214371
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824660.214371-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824660.214371
+[WORKER] processing idx=1 ts=1650824660.414617
+
+[2/4721] Processing timestamp 1650824660.414617
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824660.414617-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824660.414617
+[WORKER] processing idx=2 ts=1650824660.614595
+
+[3/4721] Processing timestamp 1650824660.614595
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824660.614595-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824660.614595
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 19
+[INFO] Memory: 0.05 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpqf9rl9z7.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824660.814929
+
+[1/4721] Processing timestamp 1650824660.814929
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824660.814929-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824660.814929
+[WORKER] processing idx=1 ts=1650824661.014571
+
+[2/4721] Processing timestamp 1650824661.014571
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824661.014571-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824661.014571
+[WORKER] processing idx=2 ts=1650824661.21452
+
+[3/4721] Processing timestamp 1650824661.21452
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824661.21452-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824661.21452
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 20
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp1vkbfis1.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824661.414562
+
+[1/4721] Processing timestamp 1650824661.414562
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824661.414562-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824661.414562
+[WORKER] processing idx=1 ts=1650824661.614605
+
+[2/4721] Processing timestamp 1650824661.614605
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824661.614605-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824661.614605
+[WORKER] processing idx=2 ts=1650824661.814806
+
+[3/4721] Processing timestamp 1650824661.814806
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824661.814806-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824661.814806
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 21
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpf8uvjopb.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824662.014565
+
+[1/4721] Processing timestamp 1650824662.014565
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824662.014565-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824662.014565
+[WORKER] processing idx=1 ts=1650824662.21448
+
+[2/4721] Processing timestamp 1650824662.21448
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824662.21448-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824662.21448
+[WORKER] processing idx=2 ts=1650824662.414484
+
+[3/4721] Processing timestamp 1650824662.414484
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824662.414484-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824662.414484
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 22
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp1flbls69.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824662.614416
+
+[1/4721] Processing timestamp 1650824662.614416
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824662.614416-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824662.614416
+[WORKER] processing idx=1 ts=1650824662.814744
+
+[2/4721] Processing timestamp 1650824662.814744
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824662.814744-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824662.814744
+[WORKER] processing idx=2 ts=1650824663.014586
+
+[3/4721] Processing timestamp 1650824663.014586
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824663.014586-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824663.014586
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 23
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpus_647vv.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824663.214436
+
+[1/4721] Processing timestamp 1650824663.214436
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824663.214436-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824663.214436
+[WORKER] processing idx=1 ts=1650824663.414491
+
+[2/4721] Processing timestamp 1650824663.414491
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824663.414491-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824663.414491
+[WORKER] processing idx=2 ts=1650824663.614443
+
+[3/4721] Processing timestamp 1650824663.614443
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824663.614443-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824663.614443
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 24
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpb5g4o8ri.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824663.814741
+
+[1/4721] Processing timestamp 1650824663.814741
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824663.814741-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824663.814741
+[WORKER] processing idx=1 ts=1650824664.014493
+
+[2/4721] Processing timestamp 1650824664.014493
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824664.014493-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824664.014493
+[WORKER] processing idx=2 ts=1650824664.214521
+
+[3/4721] Processing timestamp 1650824664.214521
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824664.214521-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824664.214521
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 25
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmph4o1p83d.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824664.414543
+
+[1/4721] Processing timestamp 1650824664.414543
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824664.414543-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824664.414543
+[WORKER] processing idx=1 ts=1650824664.614373
+
+[2/4721] Processing timestamp 1650824664.614373
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824664.614373-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824664.614373
+[WORKER] processing idx=2 ts=1650824664.814752
+
+[3/4721] Processing timestamp 1650824664.814752
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2421 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824664.814752-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824664.814752
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 26
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp85kx8adu.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824665.014437
+
+[1/4721] Processing timestamp 1650824665.014437
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824665.014437-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824665.014437
+[WORKER] processing idx=1 ts=1650824665.214403
+
+[2/4721] Processing timestamp 1650824665.214403
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824665.214403-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824665.214403
+[WORKER] processing idx=2 ts=1650824665.41439
+
+[3/4721] Processing timestamp 1650824665.41439
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824665.41439-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824665.41439
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 27
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp9e1x4_hl.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824665.614385
+
+[1/4721] Processing timestamp 1650824665.614385
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824665.614385-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824665.614385
+[WORKER] processing idx=1 ts=1650824665.814672
+
+[2/4721] Processing timestamp 1650824665.814672
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824665.814672-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824665.814672
+[WORKER] processing idx=2 ts=1650824666.014482
+
+[3/4721] Processing timestamp 1650824666.014482
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824666.014482-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824666.014482
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 28
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpufpst91h.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824666.214431
+
+[1/4721] Processing timestamp 1650824666.214431
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824666.214431-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824666.214431
+[WORKER] processing idx=1 ts=1650824666.414452
+
+[2/4721] Processing timestamp 1650824666.414452
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824666.414452-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824666.414452
+[WORKER] processing idx=2 ts=1650824666.614348
+
+[3/4721] Processing timestamp 1650824666.614348
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824666.614348-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824666.614348
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 29
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp3t6s0w8l.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824666.814652
+
+[1/4721] Processing timestamp 1650824666.814652
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824666.814652-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824666.814652
+[WORKER] processing idx=1 ts=1650824667.014413
+
+[2/4721] Processing timestamp 1650824667.014413
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824667.014413-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824667.014413
+[WORKER] processing idx=2 ts=1650824667.214336
+
+[3/4721] Processing timestamp 1650824667.214336
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824667.214336-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824667.214336
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 30
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpnshpzrlq.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824667.414374
+
+[1/4721] Processing timestamp 1650824667.414374
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824667.414374-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824667.414374
+[WORKER] processing idx=1 ts=1650824667.61435
+
+[2/4721] Processing timestamp 1650824667.61435
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824667.61435-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824667.61435
+[WORKER] processing idx=2 ts=1650824667.814701
+
+[3/4721] Processing timestamp 1650824667.814701
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824667.814701-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824667.814701
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 31
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp1m4dfpor.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824668.01439
+
+[1/4721] Processing timestamp 1650824668.01439
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824668.01439-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824668.01439
+[WORKER] processing idx=1 ts=1650824668.21438
+
+[2/4721] Processing timestamp 1650824668.21438
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824668.21438-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824668.21438
+[WORKER] processing idx=2 ts=1650824668.414455
+
+[3/4721] Processing timestamp 1650824668.414455
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824668.414455-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824668.414455
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 32
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmphs67kudh.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824668.614359
+
+[1/4721] Processing timestamp 1650824668.614359
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824668.614359-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824668.614359
+[WORKER] processing idx=1 ts=1650824668.81468
+
+[2/4721] Processing timestamp 1650824668.81468
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824668.81468-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824668.81468
+[WORKER] processing idx=2 ts=1650824669.014481
+
+[3/4721] Processing timestamp 1650824669.014481
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824669.014481-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824669.014481
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 33
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmph7m19evy.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824669.214404
+
+[1/4721] Processing timestamp 1650824669.214404
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824669.214404-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824669.214404
+[WORKER] processing idx=1 ts=1650824669.414489
+
+[2/4721] Processing timestamp 1650824669.414489
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824669.414489-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824669.414489
+[WORKER] processing idx=2 ts=1650824669.614391
+
+[3/4721] Processing timestamp 1650824669.614391
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824669.614391-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824669.614391
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 34
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpkauq8iu7.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824669.814665
+
+[1/4721] Processing timestamp 1650824669.814665
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824669.814665-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824669.814665
+[WORKER] processing idx=1 ts=1650824670.014363
+
+[2/4721] Processing timestamp 1650824670.014363
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824670.014363-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824670.014363
+[WORKER] processing idx=2 ts=1650824670.214348
+
+[3/4721] Processing timestamp 1650824670.214348
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824670.214348-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824670.214348
+[WORKER] batch complete
+[INFO] End of batch process
+[INFO] Processing batch 35
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp7roxblfi.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824670.41452
+
+[1/4721] Processing timestamp 1650824670.41452
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 2399 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824670.41452-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824670.41452
+[WORKER] processing idx=1 ts=1650824670.614352
+
+[2/4721] Processing timestamp 1650824670.614352
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360802_38066051.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 36
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp3en8r1a7.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824671.014449
+
+[1/4721] Processing timestamp 1650824671.014449
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360802_38066052.png
+[INFO] wrote: /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/frame_clusters_-109360802_38066052.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 37
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpyyu6hg92.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824671.614232
+
+[1/4721] Processing timestamp 1650824671.614232
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360801_38066053.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 38
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp1x9t9wdd.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824672.214326
+
+[1/4721] Processing timestamp 1650824672.214326
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360801_38066054.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 39
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpksaikctb.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824672.814572
+
+[1/4721] Processing timestamp 1650824672.814572
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 40
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp7whnaj5j.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824673.414357
+
+[1/4721] Processing timestamp 1650824673.414357
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 41
+[INFO] Memory: 0.04 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpdv3gbp2b.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824674.014294
+
+[1/4721] Processing timestamp 1650824674.014294
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 42
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpqp3iej61.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824674.614156
+
+[1/4721] Processing timestamp 1650824674.614156
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 43
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpnr3gaiz5.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824675.214173
+
+[1/4721] Processing timestamp 1650824675.214173
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 44
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpy4hylr8s.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824675.814521
+
+[1/4721] Processing timestamp 1650824675.814521
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360798_38066063.png
+[INFO] wrote: /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/frame_clusters_-109360798_38066063.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 45
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpo_64rbus.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824676.414323
+
+[1/4721] Processing timestamp 1650824676.414323
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360798_38066064.png
+[INFO] wrote: /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/frame_clusters_-109360798_38066064.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 46
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpsu_eqlki.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824677.014351
+
+[1/4721] Processing timestamp 1650824677.014351
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360797_38066066.png
+[INFO] wrote: /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/frame_clusters_-109360797_38066066.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 47
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpq1oaqhm0.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824677.614306
+
+[1/4721] Processing timestamp 1650824677.614306
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360797_38066067.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 48
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpav61ogp7.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824678.214241
+
+[1/4721] Processing timestamp 1650824678.214241
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360797_38066069.png
+[INFO] wrote: /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/frame_clusters_-109360797_38066069.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 49
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpqs1otc6_.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824678.814808
+
+[1/4721] Processing timestamp 1650824678.814808
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360796_38066070.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 50
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpm4djhq7z.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824679.414203
+
+[1/4721] Processing timestamp 1650824679.414203
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360796_38066072.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 51
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp1uwcacop.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824680.014188
+
+[1/4721] Processing timestamp 1650824680.014188
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360796_38066072.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 52
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpm4d9gazs.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824680.614104
+
+[1/4721] Processing timestamp 1650824680.614104
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360796_38066072.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 53
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp1hy2ivro.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824681.214119
+
+[1/4721] Processing timestamp 1650824681.214119
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360796_38066072.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 54
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp_eb2aidc.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824681.814437
+
+[1/4721] Processing timestamp 1650824681.814437
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 55
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpm76qsmr2.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824682.414131
+
+[1/4721] Processing timestamp 1650824682.414131
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360793_38066067.png
+[INFO] wrote: /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/frame_clusters_-109360793_38066067.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 56
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp58dpo78a.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824683.014137
+
+[1/4721] Processing timestamp 1650824683.014137
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360793_38066068.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 57
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpzph48n69.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824683.614099
+
+[1/4721] Processing timestamp 1650824683.614099
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360793_38066070.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 58
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpb9mvbsq8.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824684.21421
+
+[1/4721] Processing timestamp 1650824684.21421
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360794_38066071.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 59
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmppiqjd0zw.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824684.814385
+
+[1/4721] Processing timestamp 1650824684.814385
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360794_38066073.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 60
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpfom9c89p.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824685.41415
+
+[1/4721] Processing timestamp 1650824685.41415
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 61
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpynsfk12m.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824686.014199
+
+[1/4721] Processing timestamp 1650824686.014199
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360796_38066075.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 62
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpyfgar2jy.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824686.613994
+
+[1/4721] Processing timestamp 1650824686.613994
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360795_38066076.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 63
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpz1z1i7jj.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824687.214062
+
+[1/4721] Processing timestamp 1650824687.214062
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360793_38066076.png
+[INFO] wrote: /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/frame_clusters_-109360793_38066076.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 64
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpnzmewjpm.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824687.814304
+
+[1/4721] Processing timestamp 1650824687.814304
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360794_38066077.png
+[INFO] wrote: /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/frame_clusters_-109360794_38066077.png
+stitching front images!!
+started front stitch thread!
+[INFO] Starting front-facing image fusion thread...
+output_dir_timestamp:  /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/1650824687814304000
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 65
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpskvrvsrw.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824688.414058
+
+[1/4721] Processing timestamp 1650824688.414058
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360794_38066078.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 66
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp3qb30ryn.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824689.01404
+
+[1/4721] Processing timestamp 1650824689.01404
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[DEBUG] Found 484 overlapping May frames
+[DEBUG] Found 0 overlapping left frames
+[DEBUG] Found 0 overlapping right frames
+[WARN] NO FRAMES!
+output_path:  ./no_frames/1650824689.01404-no_frames.png
+no frames ... returning
+[WORKER] done ts=1650824689.01404
+[WORKER] processing idx=1 ts=1650824689.213959
+
+[2/4721] Processing timestamp 1650824689.213959
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360796_38066077.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 67
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp6o_86ic4.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824689.614001
+
+[1/4721] Processing timestamp 1650824689.614001
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360796_38066077.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 68
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmp89ply6pb.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824690.214014
+
+[1/4721] Processing timestamp 1650824690.214014
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360797_38066077.png
+[INFO] wrote: /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/frame_clusters_-109360797_38066077.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 69
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpqcgpc4nm.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824690.814335
+
+[1/4721] Processing timestamp 1650824690.814335
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360796_38066075.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 70
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpww73yohr.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824691.414088
+
+[1/4721] Processing timestamp 1650824691.414088
+delta:  0.0
+[INFO] Looking for overlapping frames...
+[INFO] Saved debug plot to /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused_2conmod/debug_ellipse_-109360798_38066075.png
+[WARN] Worker timed out; terminating...
+[INFO] End of batch process
+[INFO] Continuing despite worker error.
+[INFO] Processing batch 71
+[INFO] Memory: 0.03 GB
+[LAUNCH] /home/kristen/miniconda3/envs/hloc/bin/python3 -u -m seasonal_comparison.timestamp_batch_worker /tmp/tmpdgb9hhxd.json
+[WORKER] mpl version: 3.10.5 backend: Agg
+[WORKER] cv2 version: 4.12.0
+[WORKER] starting
+[INFO] Precomputing timestamps...
+[WORKER] 3 timestamps in batch
+[WORKER] processing idx=0 ts=1650824692.014203
+
+[1/4721] Processing timestamp 1650824692.014203
+delta:  0.0
+[INFO] Looking for overlapping frames...

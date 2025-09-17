@@ -307,10 +307,12 @@ def reorder_corners(corner_tuples):
     [top-left, top-right, bottom-right, bottom-left]
     """
     if not isinstance(corner_tuples[0],tuple):
-        print("This should be list of tuples :(")
-        print(corner_tuples)
-        print(type(corner_tuples))
-        raise OSError 
+        corner_tuples = list(zip(corner_tuples[1::2], corner_tuples[0::2]))
+        # print("This should be list of tuples :(")
+        # print(corner_tuples)
+        # print(type(corner_tuples))
+
+        # raise OSError 
 
     pts = np.array(corner_tuples)
     pts = pts.reshape((4,2))
@@ -385,6 +387,11 @@ def stitch_and_rotate_north(frames_to_stitch,stitch_cfg,output_path, processed_c
     #print(f"Writing stitched image: {chunk_path}")
     cv.imwrite(output_path, stitched_img)
 
+    txt_file_path = output_path[:-3] + "txt" 
+    with open(txt_file_path,"w") as f:
+        for frame in frames_to_stitch:
+            f.write(frame + "\n")
+
     del stitched_img
 
 def get_pano_path(output_dir):
@@ -443,13 +450,13 @@ def stitch_clusters(cluster_idx, frame_list, output_dir,
     chunks = chunk_filenames(paths) if len(paths) > 5 else [paths]
 
     panos = {}
+
     for part_idx, chunk in enumerate(chunks):
         #print("chunk:",chunk)
         pano_path = _pano_path(output_dir, prefix, cluster_idx, part_idx)
 
         # Choose your stitcher; if you don't have rotate-north, fall back.
         stitch_and_rotate_north(chunk, stitch_cfg, pano_path, processed_compass_headings) 
-        #print("stitched and rotated successfuly!") 
 
         polygons = _safe_polygons(chunk)
         if not polygons:

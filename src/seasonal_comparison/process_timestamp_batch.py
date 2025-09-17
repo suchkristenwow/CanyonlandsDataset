@@ -591,8 +591,6 @@ class seasonalComparer:
     def process_timestamp(self,i,timestamp):
         print(f"\n[{i+1}/{len(self.may_cov_timestamps)}] Processing timestamp {timestamp}")
 
-        #output_path = os.path.join(self.paths["match_output_dir"], "overlapping_frames" + str(int(timestamp*10**9)) + "_" + str(max_filename_no + 1) + ".png")  
-
         if os.path.exists(self.paths["match_output_dir"]):
             processed_timestamps = [x for x in os.listdir(self.paths["match_output_dir"]) if "overlapping_frames" + str(int(timestamp*10**9)) in x]
             if len(processed_timestamps) > 0:
@@ -667,7 +665,6 @@ class seasonalComparer:
         
         clusters = cluster_overlapping_frame_instances(nov_polys) 
       
-
         for i,cluster in enumerate(clusters):
             stitch_clusters(
                     i,
@@ -692,7 +689,7 @@ class seasonalComparer:
         i_may = find_closest_index(self.may_timestamps, timestamp, max_delta_t=0.3)
         center = (self.cam_lon[i_may], self.cam_lat[i_may]) 
 
-        print("visualize overlapping frames") 
+        print("visualizing overlapping frames ...") 
         output_fig_dir = os.path.join(output_dir_timestamp, "plots")
         #each pickle contains a dict where the keys are the fused image path and the entries are a list of corresponding polygon object  
         may_pano_pickles = [str(f) for f in Path(may_dir).glob("*.pickle") if f.is_file()]
@@ -784,7 +781,7 @@ class seasonalComparer:
                             xy=center,
                             width=width,
                             height=height,
-                            angle=90-theta,
+                            angle=theta,
                             edgecolor='blue',
                             facecolor='none',
                             linestyle='dotted'  # or use '--' for dashed
