@@ -2,3 +2,5 @@ src/seasonal_comparison/__pycache__
 no_frames/
  *.png
 logs/
+src/image_similarity/logs/
+src/image_similarity/__pycache__

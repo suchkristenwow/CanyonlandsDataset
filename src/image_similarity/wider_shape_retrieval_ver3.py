@@ -300,33 +300,6 @@ ax_gps.set_ylim(min_lat - dy, max_lat + dy)
 mid_lat = 0.5 * (min_lat + max_lat)
 ax_gps.set_aspect(np.cos(np.deg2rad(mid_lat)), adjustable='box')
 
-# Legend (keep it outside)
-# if legend_handles:
-#     ax_gps.legend(
-#         handles=legend_handles,
-#         loc="center left",
-#         bbox_to_anchor=(1.02, 0.5),
-#         borderaxespad=0,
-#         fontsize=7,
-#         frameon=False,
-#         handlelength=2.5
-#     )
-
-# add_scalebar_1m_bottom_left(ax_gps)
-
-# AFTER you create fig_gps/ax_gps and draw everything (limits/aspect final):
-# fig_gps.subplots_adjust(right=0.78)  # reserve ~22% for legend
-
-# leg = fig_gps.legend(
-#     handles=legend_handles,
-#     loc="center left",
-#     bbox_to_anchor=(0.80, 0.5),   # in figure coords
-#     borderaxespad=0,
-#     fontsize=7,
-#     frameon=False,
-#     handlelength=2.5,
-# )
-
 # aspect set, scalebar placed
 ax_leg.legend(
     handles=legend_handles,

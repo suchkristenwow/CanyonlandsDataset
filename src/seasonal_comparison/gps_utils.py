@@ -133,7 +133,7 @@ def load_covariance_matrix(covariance_dir, available_timestamps, timestamp, thre
         timestamp = timestamp * 1e-9
         closest_timestamp = closest_timestamp * 1e-9
 
-    print("delta: ",abs(timestamp - closest_timestamp)) 
+    #print("delta: ",abs(timestamp - closest_timestamp)) 
 
     if abs(timestamp - closest_timestamp) <= threshold:
         return np.genfromtxt(filename)

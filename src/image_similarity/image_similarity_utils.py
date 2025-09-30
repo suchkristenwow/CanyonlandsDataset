@@ -19,6 +19,38 @@ timestamp = 1650825687996141824  # nanoseconds
 GRID_COLORS = [plt.cm.tab10(i) for i in [0, 1, 2, 3]]
 
 
+def sift_ransac_inlier_ratio(imgA_gray, imgB_gray, ratio_test=0.75, model="affine"):
+    # Detect + describe
+    sift = cv.SIFT_create()
+    kA, dA = sift.detectAndCompute(imgA_gray, None)
+    kB, dB = sift.detectAndCompute(imgB_gray, None)
+    if dA is None or dB is None or len(kA)<4 or len(kB)<4:
+        return 0.0
+
+    # Match with ratio test
+    matcher = cv.BFMatcher(cv.NORM_L2, crossCheck=False)
+    knn = matcher.knnMatch(dA, dB, k=2)
+    good = []
+    for m,n in knn:
+        if m.distance < ratio_test * n.distance:
+            good.append(m)
+    if len(good) < 4:
+        return 0.0
+
+    # Build coords
+    ptsA = np.float32([kA[m.queryIdx].pt for m in good])
+    ptsB = np.float32([kB[m.trainIdx].pt for m in good])
+
+    # Fit model
+    if model == "homography":
+        M, mask = cv.findHomography(ptsA, ptsB, cv.RANSAC, ransacReprojThreshold=3.0)
+    else:  # affine (least-squares + RANSAC)
+        M, mask = cv.estimateAffine2D(ptsA, ptsB, method=cv.RANSAC, ransacReprojThreshold=3.0)
+    if mask is None:
+        return 0.0
+    inliers = int(mask.sum())
+    return inliers / max(len(good), 1)
+    
 def letterbox(im, hw=TARGET_HW):
     th, tw = hw
     h, w = im.shape[:2]
@@ -34,6 +66,7 @@ def letterbox(im, hw=TARGET_HW):
 def load_gray_eq(p):
     im = cv.imread(p, cv.IMREAD_GRAYSCALE)
     if im is None:
+        print("load_gray_eq!")
         return None
     im = cv.GaussianBlur(im, (3, 3), 0)
     im = cv.createCLAHE(2.0, (8, 8)).apply(im)
@@ -56,10 +89,31 @@ def hog_vec(im):
 def hog_vec_on_grad(im):
     return hog_vec(grad(im))
 
-def cos_sims(q, M):
-    q = q / (np.linalg.norm(q) + 1e-9)
-    M = M / (np.linalg.norm(M, axis=1, keepdims=True) + 1e-9)
-    return (M @ q)
+import numpy as np
+
+def cos_sims(q: np.ndarray, feats: np.ndarray) -> np.ndarray:
+    """
+    Compute cosine similarities between a single query vector q (D,)
+    or (1, D) and a matrix feats (N, D). Returns (N,) sims.
+    """
+    q = np.asarray(q, dtype=np.float32)
+    F = np.asarray(feats, dtype=np.float32)
+
+    # Ensure shapes are (D,) and (N, D)
+    if q.ndim == 2 and q.shape[0] == 1:
+        q = q[0]
+    elif q.ndim != 1:
+        raise ValueError(f"q must be (D,) or (1, D), got {q.shape}")
+
+    if F.ndim != 2:
+        raise ValueError(f"feats must be (N, D), got {F.shape}")
+
+    # L2-normalize
+    q = q / (np.linalg.norm(q) + 1e-8)
+    F = F / (np.linalg.norm(F, axis=1, keepdims=True) + 1e-8)
+
+    # Cosine = dot of unit vectors
+    return F @ q  # (N,)
 
 def ssim(a, b):
     a = a.astype(np.float32) / 255.0
