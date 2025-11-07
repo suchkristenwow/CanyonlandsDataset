@@ -93,8 +93,8 @@ def embed_clip(img_rgb_uint8: np.ndarray) -> np.ndarray:
         #print("[embed_clip] to device:", t.device, tuple(t.shape))
 
         # forward
-        with torch.cuda.amp.autocast(False):
-            feats = model.encode_image(t)   # [1, D]
+        with torch.amp.autocast("cuda", enabled=False):
+            feats = model.encode_image(t)
         #print("[embed_clip] feats:", tuple(feats.shape), feats.dtype)
 
         # L2 normalize and return 1-D np.float32

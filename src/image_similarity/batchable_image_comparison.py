@@ -1,21 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
-"""
-Batchable Canyonlands matching & plotting utility.
-
-Example:
-  python run_matches.py \
-    --idx /media/kristen/easystore2/RestorebotData/analysis_shape/nov_index.npz \
-    --may /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused/1650825680196263936/May/may_cluster0000_part02.png \
-    --nov-dir /media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused/1650825680196263936/Nov \
-    --timestamp-ns 1650825680196263936 \
-    --topk 4
-
-You can pass multiple --may values or a glob:
-  python run_matches.py --idx ... --may "/path/**/May/*.png" --nov-dir-base "/path/**/Nov"
-"""
-
 import os, sys, gc, glob, pickle, argparse
 from pathlib import Path
 from functools import lru_cache
@@ -29,6 +13,7 @@ import matplotlib.pyplot as plt
 from matplotlib import gridspec, patches as mpatches
 from matplotlib.patches import Polygon as MplPolygon, Ellipse
 from shapely.ops import unary_union
+import time 
 
 # ---- your package utils ----
 from seasonal_comparison.gps_utils import (
@@ -162,7 +147,7 @@ def save_top_grid(grid_title_png: str, numbered_rows: List[Tuple[int, str, float
         axr.set_title(f"{rank}.  final={final:.3f}  SSIM={gssim_val:.3f}", fontsize=9)
         set_axes_border(axr, color_for_rank(rank, PALETTE), lw=2)
 
-    plt.tight_layout()
+    #plt.tight_layout()
     fig.savefig(grid_title_png, dpi=220, pil_kwargs={"dpi": (220, 220)}) 
     plt.close(fig)
 
@@ -184,6 +169,8 @@ def autoscale_from_patches(ax):
 
 # ------------------- CORE WORKFLOW -------------------
 def process_may_frame(paths: Paths, covp: CovarPaths, args: RunArgs):
+    #print("processing may frame. This is covp: ",covp) 
+
     may_dir = os.path.dirname(paths.may_img)
     out_dir = paths.out_dir or may_dir
     os.makedirs(out_dir, exist_ok=True)
@@ -197,23 +184,66 @@ def process_may_frame(paths: Paths, covp: CovarPaths, args: RunArgs):
     start_time = time.perf_counter()
     paths_arr, feats_arr, idx_blob = load_index(paths.idx_npz)
     end_time = time.perf_counter() 
-    print(f"Loading index took: {end_time-start_time} s")
+    #print(f"Loading index took: {end_time-start_time} s")
 
 
-    print(f"[INFO] Finding top-{args.topk_show} overall matches for:\n  {paths.may_img}")
-    #top_rows = get_top_matches(paths.idx_npz, paths.may_img, args.topk_show)
+    #print(f"[INFO] Finding top-{args.topk_show} overall matches for:\n  {paths.may_img}")
+    _WORKER = {}
+    # build cov paths once
+    # cov_dir = os.path.join(may_dir, "processed_results", "covariance_matrices")
+    # results_dir = os.path.join(may_dir, "processed_results")
+    # covp = CovarPaths(cov_dir=cov_dir, results_dir=results_dir)
+
+    # Memory-map the index to avoid copying per worker
+    data = np.load(paths.idx_npz, allow_pickle=True, mmap_mode='r')
+
+    data_paths = data["paths"]
+    feats = data["feats"]  # HOG features, shape [N, D] ?
+
+    # Precompute HOG norms once for fast cosine
+    _WORKER["paths"] = data_paths
+    _WORKER["feats"] = feats
+    _WORKER["feats_norm"] = np.maximum(np.linalg.norm(feats, axis=1), 1e-8)
+
+    # Build path -> row index once
+    path_to_row = {str(p): i for i, p in enumerate(data_paths)}
+    _WORKER["path_to_row"] = path_to_row
+
+    # Load CLIP/DINO sidecars once (no ensure_embed_sidecars here; do that in parent)
+    try:
+        clip_mat, dino_mat = load_embed_sidecars(paths.idx_npz) #idx_npz 
+        # Unit-normalize rows once so cosine is just a dot
+        clip_norms = np.maximum(np.linalg.norm(clip_mat, axis=1), 1e-8)
+        dino_norms = np.maximum(np.linalg.norm(dino_mat, axis=1), 1e-8)
+        clip_mat = clip_mat / clip_norms[:, None]
+        dino_mat = dino_mat / dino_norms[:, None]
+        _WORKER["clip_mat"] = clip_mat
+        _WORKER["dino_mat"] = dino_mat
+    except Exception:
+        _WORKER["clip_mat"] = None
+        _WORKER["dino_mat"] = None
+
+    # store in global dict
+    _WORKER["idx_npz"] = paths.idx_npz
+    _WORKER["covp"] = covp
+    _WORKER["weights"] = args.weights
+    _WORKER["flags"] = dict(use_clip=args.use_clip, use_dino=args.use_dino, use_sift=args.use_sift)
+    _WORKER["topk"] = args.topk_show 
+
+    print("Finding top matches ...")
     start_time = time.perf_counter()
     top_rows = get_top_matches_multi(
-        paths.may_img, 48, weights=args.weights, idx_npz_path=paths.idx_npz 
+        paths.may_img, 48, _WORKER, weights=args.weights
     )
     end_time = time.perf_counter() 
-    print(f"Finding top matches took: {end_time-start_time} s")
+    print(f"Finding top matches took: {end_time-start_time:.2f} s")
 
     start_time = time.perf_counter()
     top_numbered_all, rank_top_all, metrics_top_all = get_top_match_metrics(top_rows)
     end_time = time.perf_counter() 
-    print(f"Finding top match metrics took: {end_time-start_time} s")
+    print(f"Finding top match metrics took: {end_time-start_time:.2f} s")
     
+    start_time = time.perf_counter()
     top_numbered_sel = diverse_rerank(
         top_numbered_all,
         k=args.topk_show,
@@ -226,9 +256,14 @@ def process_may_frame(paths: Paths, covp: CovarPaths, args: RunArgs):
 
     top_numbered = renumber_selected(top_numbered_sel)
     rank_top, metrics_top = rebuild_rank_and_metrics(top_numbered, metrics_top_all)
+    end_time = time.perf_counter() 
+
+    print(f"rebuilding/ranking metrics took: {end_time-start_time:.2f} s") 
 
     # ---- May polygons[]
     print("[INFO] Loading May pano and polygons...")
+
+    start_time = time.perf_counter() 
     may_pano = load_pano_pickle_for_image(paths.may_img, which="may")
     try:
         may_key = normalized_key(paths.may_img, may_pano)
@@ -239,6 +274,8 @@ def process_may_frame(paths: Paths, covp: CovarPaths, args: RunArgs):
     may_overlap_subset = find_largest_overlap_subset(may_polys_all)
     if not may_overlap_subset:
         raise RuntimeError("Empty/invalid May polygons.")
+    end_time = time.perf_counter() 
+    print(f"Loading may/nov polygons took {np.round(end_time-start_time,2)} s")
 
     # ---- Covariance + center
     print("[INFO] Computing covariance ellipse & center...")
@@ -253,29 +290,31 @@ def process_may_frame(paths: Paths, covp: CovarPaths, args: RunArgs):
     
     start_time = time.perf_counter()
     inside_rows, inside_numbered, rank_inside, metrics_inside = get_inside_match_metrics_multi(
-        idx_blob, paths.may_img, nov_inside_frames,
-        weights=args.weights, idx_npz_path=paths.idx_npz
+        idx_blob, paths.may_img, nov_inside_frames,_WORKER, weights=args.weights
     )
     end_time = time.perf_counter()
-    print(f"Getting inside match metrics took: {end_time - start_time}")
-
+    print(f"Getting inside match metrics took: {end_time - start_time}") 
 
     inside_top_set = {nv_path for (rank, nv_path, *_rest) in inside_numbered}
 
-    # Compute similarity metrics
-    # after:
     scaled_cov, center, _ = compute_covariance_and_center(covp, args.timestamp_ns)
     cov_ellipse = ellipse_from_cov(scaled_cov, center)
 
     # export CSV
-    top_match_paths = [x[1] for x in top_numbered]
+    top_match_paths = [x[1] for x in top_numbered] 
 
-    csv_path = os.path.join(out_dir, "metrics_all.csv")  # or f"{Path(paths.may_img).stem}_metrics.csv"
+    metrics_dir = os.path.join(out_dir,"metrics") 
+    if not os.path.exists(metrics_dir):
+        os.makedirs(metrics_dir, exist_ok=True) 
+
+    csv_path = os.path.join(metrics_dir,f"{os.path.basename(paths.may_img)[:-4]}.csv") 
     export_csv_for_may(paths, top_match_paths, args, idx_blob, cov_ellipse, center, csv_path)
-    print(f"[OK] Wrote CSV: {csv_path}")
+    print(f"batchable image comparison: [OK] Wrote CSV: {csv_path}")
 
     # ------------------- GPS plot -------------------
     print("[INFO] Rendering GPS-only plot ...")
+    start_time = time.perf_counter()  
+
     fig_gps = plt.figure(figsize=(10.5, 6), dpi=150, constrained_layout=False)
     gs = fig_gps.add_gridspec(1, 2, width_ratios=[1.0, 0.45], wspace=0.03)
     ax_gps = fig_gps.add_subplot(gs[0, 0])
@@ -374,19 +413,25 @@ def process_may_frame(paths: Paths, covp: CovarPaths, args: RunArgs):
     #plt.savefig(gps_plot_png, dpi=220) #, dpi=220, pil_kwargs={"dpi": (220, 220)}
     fig_gps.savefig(gps_plot_png) 
     plt.close(fig_gps)
+
+    end_time = time.perf_counter()
+    print(f"GPS plot took: {end_time-start_time} s")
     print(f"[OK] Wrote GPS plot: {gps_plot_png}")
 
     # ------------------- Grids -------------------
-    print("[INFO] Saving top-4 overall grid ...")
+    t0 = time.perf_counter()
+    #print("[INFO] Saving top-4 overall grid ...")
     save_top_grid(top4_png, top_numbered)
     print(f"[OK] Wrote: {top4_png}")
 
     if inside_numbered:
-        print("[INFO] Saving top-4 inside-ellipse grid ...")
+        #print("[INFO] Saving top-4 inside-ellipse grid ...")
         save_top_grid(ellipse_top4_png, inside_numbered)
         print(f"[OK] Wrote: {ellipse_top4_png}")
     else:
         print("[WARN] No inside-ellipse candidates with successful similarity computation.")
+    tf = time.perf_counter()
+    print(f"Making grids took: {tf-t0}")
 
     gc.collect()
 
@@ -445,7 +490,10 @@ def main():
         sift=args_ns.w_sift, ssim=args_ns.w_ssim, chamfer=args_ns.w_chamfer
     )
 
+    #print(f"[batchable_image_comparison] there are {len(may_list)} may images")
     for may_img in may_list:
+        start_time = time.perf_counter()
+        
         nov_dir = infer_nov_dir(may_img)
 
         if not os.path.isdir(nov_dir):
@@ -469,9 +517,12 @@ def main():
             print("[INFO] processing may frame ...")
             process_may_frame(pth, covp, rargs)
             print("Woo! Successfully processed the frame!")
+
         except Exception as e:
             print(f"[ERR] Failed on {may_img}: {e}", file=sys.stderr)
 
+        end_time = time.perf_counter()
+        print(f"Done with 1 May image: That took {np.round(end_time - start_time, 2)} s")
 
 if __name__ == "__main__":
     main()

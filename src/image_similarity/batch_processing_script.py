@@ -78,7 +78,9 @@ def read_metrics_csv(may_img: str) -> List[Dict[str, Any]]:
     Returns list of dict rows; adds 'may_img' column.
     """
     may_dir = os.path.dirname(may_img)
-    csv_path = os.path.join(may_dir, "metrics_all.csv")
+    metrics_dir = os.path.join(may_dir, "metrics")  #os.path.splitext(filename_with_extension)[0] 
+    complete_filename = os.path.basename(may_img)
+    csv_path = os.path.join(metrics_dir, f"{os.path.splitext(complete_filename)[0]}.csv") #this used to be all_metrics
     if not os.path.isfile(csv_path):
         # The run may have failed before CSV export
         print(f"[WARN] Missing metrics CSV: {csv_path}")
@@ -117,7 +119,8 @@ def find_may_images(root):
     for p in all_pngs:
         name = os.path.basename(p)
         if MAY_FUSED_RE.match(name):
-            out.append(p)
+            if p not in out:
+                out.append(p)
         else:
             #print("[WARN] skipping name: ",name)
             skipped += 1
@@ -149,11 +152,13 @@ def main():
 
     # Discover May images
     may_list = find_may_images(args.root)
+    print(f"there are {len(may_list)} may images") 
+    may_list = may_list[::10]
+    print(f"Downsampled to {len(may_list)} images.") 
+
     if not may_list:
         print(f"[ERR] No May images found under {args.root}", file=sys.stderr)
         sys.exit(2)
-
-    #filter filenames 
 
     print(f"[INFO] Found {len(may_list)} May images. Processing with {args.workers} workers...")
 
@@ -163,6 +168,8 @@ def main():
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as ex:
         try:
+            print("submitting to thread pool executor: this is args: ",args) 
+            print() 
             futs = [ex.submit(run_one, m, args) for m in may_list]
             for fut in concurrent.futures.as_completed(futs):
                 may_img, rc = fut.result()
@@ -173,15 +180,8 @@ def main():
         finally:
             ex.shutdown(wait=True, cancel_futures=True)
 
-    # with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as ex:
-    #     futs = [ex.submit(run_one, m, args) for m in may_list]
-    #     for fut in concurrent.futures.as_completed(futs):
-    #         may_img, rc = fut.result()
-    #         results.append((may_img, rc))
-    #         status = "OK" if rc == 0 else f"FAIL({rc})"
-    #         print(f"[DONE] {status} :: {may_img}")
-
-    print(f"[INFO] All runs finished in {time.time()-start:.1f}s. Aggregating metrics...")
+  
+    print(f"[INFO] All runs finished in {time.time()-start:.2f}s. Aggregating metrics...")
 
     # Aggregate all metrics
     all_rows: List[Dict[str, Any]] = []
@@ -199,10 +199,20 @@ def main():
     if "final_weighted" not in fieldnames:
         print("[ERR] 'final_weighted' column not found in metrics CSVs.", file=sys.stderr)
         # still write a combined file for debugging
-        fieldnames = sorted(set().union(*[row.keys() for row in all_rows]))
+        fieldnames = sorted(set().union(*[row.keys() for row in all_rows])) 
+    
+    # remove 'may_img' if present
+    if "may_img" in fieldnames:
+        fieldnames = [f for f in fieldnames if f != "may_img"]
+
     # sort
     all_rows.sort(key=lambda r: parse_float_safe(r.get("final_weighted", "nan")), reverse=True)
     topN = all_rows[:100]
+
+    # sanitize rows
+    for row in topN:
+        if "may_img" in row:
+            del row["may_img"]
 
     # Ensure output dir exists
     Path(os.path.dirname(args.out)).mkdir(parents=True, exist_ok=True)

@@ -8,6 +8,11 @@ from typing import Dict, List, Tuple, Iterable, Any
 import os, sys, argparse, subprocess, concurrent.futures, csv, glob, time, pickle
 import re
 
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+
+
 import numpy as np
 import cv2 as cv
 import matplotlib
@@ -18,6 +23,7 @@ from matplotlib.patches import Polygon as MplPolygon, Ellipse
 from matplotlib.lines import Line2D
 from matplotlib.transforms import blended_transform_factory
 from shapely.ops import unary_union
+from numpy.linalg import norm 
 
 # ---------- config defaults (override via CLI) ----------
 DEFAULT_ROOT = "/media/kristen/easystore2/RestorebotData/benchmarking_ex/matches_fused"
@@ -25,6 +31,7 @@ DEFAULT_OUT  = "/media/kristen/easystore2/RestorebotData/benchmarking_ex/global_
 # Set these or pass via CLI:
 DEFAULT_IDX  = "/path/to/nov_index.npz"
 DEFAULT_MAY_RESULTS_BASE = "/path/to/May2022/1conmod"
+_WORKER = {} 
 
 # ---- your package utils ----
 from seasonal_comparison.gps_utils import (
@@ -107,7 +114,7 @@ def find_may_images(root):
     return out
 
 # --- worker globals (live inside each process) ---
-_WORKER = {}
+
 
 def _init_worker(idx_npz: str, may_results_base: str, weights: dict,
                  use_clip: bool, use_dino: bool, use_sift: bool, topk: int):
@@ -118,6 +125,34 @@ def _init_worker(idx_npz: str, may_results_base: str, weights: dict,
     cov_dir = os.path.join(may_results_base, "processed_results", "covariance_matrices")
     results_dir = os.path.join(may_results_base, "processed_results")
     covp = CovarPaths(cov_dir=cov_dir, results_dir=results_dir)
+
+    # Memory-map the index to avoid copying per worker
+    data = np.load(idx_npz, allow_pickle=True, mmap_mode='r')
+    paths = data["paths"]
+    feats = data["feats"]  # HOG features, shape [N, D] ?
+   
+    # Precompute HOG norms once for fast cosine
+    _WORKER["paths"] = paths
+    _WORKER["feats"] = feats
+    _WORKER["feats_norm"] = np.maximum(norm(feats, axis=1), 1e-8)
+
+    # Build path -> row index once
+    path_to_row = {str(p): i for i, p in enumerate(paths)}
+    _WORKER["path_to_row"] = path_to_row
+
+    # Load CLIP/DINO sidecars once (no ensure_embed_sidecars here; do that in parent)
+    try:
+        clip_mat, dino_mat = load_embed_sidecars(idx_npz)
+        # Unit-normalize rows once so cosine is just a dot
+        clip_norms = np.maximum(norm(clip_mat, axis=1), 1e-8)
+        dino_norms = np.maximum(norm(dino_mat, axis=1), 1e-8)
+        clip_mat = clip_mat / clip_norms[:, None]
+        dino_mat = dino_mat / dino_norms[:, None]
+        _WORKER["clip_mat"] = clip_mat
+        _WORKER["dino_mat"] = dino_mat
+    except Exception:
+        _WORKER["clip_mat"] = None
+        _WORKER["dino_mat"] = None
 
     # store in global dict
     _WORKER["idx_npz"] = idx_npz

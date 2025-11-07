@@ -40,6 +40,7 @@ from shapely.geometry import Point as ShapelyPoint
 from shapely.affinity import scale as shp_scale, rotate as shp_rotate, translate as shp_translate
 
 GEOD = Geod(ellps="WGS84")
+_WORKER = {} 
 
 @dataclass
 class Paths:
@@ -254,16 +255,119 @@ def add_scalebar_1m_bottom_left(ax, label="1 m", pad_frac=0.02, lw=2):
         bbox=dict(facecolor="white", alpha=0.7, edgecolor="none", pad=0.2)
     )
 
+def get_top_matches_multi(MAY, TOPK, _WORKER, weights=None, geom_topk=32, downscale=0.5):
+    # weights
+    print("get_top_matches_multi ...")
+    W = {'clip':0.22,'dino':0.22,'hog':0.12,'sift':0.20,'ssim':0.18,'chamfer':0.14}
+    if weights: W.update(weights)
 
-def get_top_matches_multi(MAY, TOPK, weights=None, idx_npz_path=None):
+    if "paths" not in _WORKER:
+        raise OSError 
+
+    paths        = _WORKER["paths"]
+    feats        = _WORKER["feats"]
+    feats_norm   = _WORKER["feats_norm"]
+    clip_mat     = _WORKER["clip_mat"]   # rows are unit-norm if present
+    dino_mat     = _WORKER["dino_mat"]   # rows are unit-norm if present
+
+    # --- query prep (May) ---
+    mg = load_gray_eq(MAY); assert mg is not None and mg.ndim == 2
+    q_hog = hog_vec(mg)
+    q_hog = q_hog / (np.linalg.norm(q_hog) + 1e-8)
+
+    # HOG cosine for all in one GEMV
+    hog_sims = (feats @ q_hog) / feats_norm  # shape [N]
+
+    # Optional CLIP/DINO (vectorized)
+    rgbM = cv.cvtColor(cv.imread(MAY, cv.IMREAD_COLOR), cv.COLOR_BGR2RGB)
+    clip_sims = None
+    if clip_mat is not None:
+        v_clip = embed_clip(rgbM)
+        v_clip = v_clip / (np.linalg.norm(v_clip) + 1e-8)
+        clip_sims = clip_mat @ v_clip  # since rows are unit-norm
+
+    dino_sims = None
+    if dino_mat is not None:
+        v_dino = embed_dino(rgbM)
+        v_dino = v_dino / (np.linalg.norm(v_dino) + 1e-8)
+        dino_sims = dino_mat @ v_dino
+
+    # Normalize per channel to [0,1] (cheap)
+    def nzminmax(x):
+        if x is None: return None
+        lo, hi = np.nanmin(x), np.nanmax(x)
+        return (x - lo) / (hi - lo + 1e-8)
+
+    hog_n  = nzminmax(hog_sims)
+    clip_n = nzminmax(clip_sims) if clip_sims is not None else None
+    dino_n = nzminmax(dino_sims) if dino_sims is not None else None
+
+    # Blend (no loops)
+    coarse = 0.0
+    denom = 0.0
+    if hog_n  is not None: coarse += W['hog']  * hog_n;  denom += W['hog']
+    if clip_n is not None: coarse += W['clip'] * clip_n; denom += W['clip']
+    if dino_n is not None: coarse += W['dino'] * dino_n; denom += W['dino']
+    coarse = coarse / max(denom, 1e-8)
+
+    # Top-K via argpartition (much faster than full sort)
+    # Expand K for geometric rerank, then compress to final TOPK
+    K1 = max(TOPK, geom_topk)
+    idx_part = np.argpartition(-coarse, K1)[:K1]
+    # Order those by score
+    top_idx = idx_part[np.argsort(-coarse[idx_part])]
+
+    # --- cheap precompute for geometry ---
+    mg_small = cv.resize(mg, None, fx=downscale, fy=downscale, interpolation=cv.INTER_AREA)
+    gM = grad(mg_small); eM = cv.Canny(gM, 50, 150)
+    Hs, Ws = mg_small.shape[:2]
+
+    rows = []
+    # Only geometric rerank on this small shortlist
+    for i in top_idx:
+        npth = str(paths[i])
+        ng = load_gray_eq(npth)
+        if ng is None:
+            continue
+
+        # Downscale target too
+        ngs = cv.resize(ng, (Ws, Hs), interpolation=cv.INTER_AREA)
+
+        # ECC align (fewer iters/pyr levels)
+        ng_al = ecc_align(mg_small, ngs, "affine")  # make sure your ECC uses small iters
+
+        gssim = ssim(grad(mg_small), grad(ng_al))
+        eN = cv.Canny(grad(ng_al), 50, 150)
+        ch = chamfer(eM, eN) / max(Hs, Ws)
+
+        # SIFT on downscaled images (or ORB if still too slow)
+        sift_ir = sift_ransac_inlier_ratio(mg_small, ngs, model="affine")
+
+        final = (W['hog']*float(hog_n[i]) +
+                 (W['clip']*float(clip_n[i]) if clip_n is not None else 0.0) +
+                 (W['dino']*float(dino_n[i]) if dino_n is not None else 0.0) +
+                 W['sift']*float(sift_ir) +
+                 W['ssim']*float(gssim) -
+                 W['chamfer']*float(ch))
+
+        rows.append((npth, float(coarse[i]), float(gssim), float(ch), float(final)))
+
+    # Final selection to requested TOPK
+    rows.sort(key=lambda r: -r[4])
+    return rows[:TOPK]
+
+def get_top_matches_multi_OLD(MAY, TOPK, weights=None, idx_npz_path=None):
     print("getting top matches multi ...")
     # weights: dict with keys 'clip','dino','hog','sift','ssim','chamfer'
     W = {'clip':0.22,'dino':0.22,'hog':0.12,'sift':0.20,'ssim':0.18,'chamfer':0.14}
     if weights: W.update(weights)
+    print("updated the weights" )
 
     data = np.load(idx_npz_path, allow_pickle=True) 
 
     print("parsing data ...")
+    print(data.keys()) 
+
     paths, feats = data["paths"], data["feats"]
     mg = load_gray_eq(MAY); assert mg is not None and mg.ndim==2
     q_hog = hog_vec(mg)
@@ -359,7 +463,103 @@ def cos_sim(a: np.ndarray, b: np.ndarray) -> float:
     return float(np.dot(a, b) /
                 ((np.linalg.norm(a) + 1e-8) * (np.linalg.norm(b) + 1e-8)))
                 
-def get_inside_match_metrics_multi(data, MAY, nov_inside_candidates, weights=None, idx_npz_path=None):
+def get_inside_match_metrics_multi(data, MAY, nov_inside_candidates, _WORKER, weights=None, downscale=0.5):
+    print("get_inside_match_metrics ...")
+    W = {'clip':0.22,'dino':0.22,'hog':0.12,'sift':0.20,'ssim':0.18,'chamfer':0.14}
+    if weights: W.update(weights)
+
+    if "paths" not in _WORKER:
+        raise OSError 
+
+    paths        = _WORKER["paths"]
+    feats        = _WORKER["feats"]
+    feats_norm   = _WORKER["feats_norm"]
+    path_to_row  = _WORKER["path_to_row"]
+    clip_mat     = _WORKER["clip_mat"]   # unit-norm rows or None
+    dino_mat     = _WORKER["dino_mat"]
+
+    if len(nov_inside_candidates) == 0:
+        raise OSError("No inside candidates.")
+
+    mg = load_gray_eq(MAY); assert mg is not None and mg.ndim == 2
+    q_hog = hog_vec(mg)
+    q_hog = q_hog / (np.linalg.norm(q_hog) + 1e-8)
+
+    # HOG sims for all
+    hog_sims_all = (feats @ q_hog) / feats_norm
+    path_to_hog = {str(paths[i]): float(hog_sims_all[i]) for i in range(len(paths))}
+
+    # Precompute May embeddings once
+    rgbM = cv.cvtColor(cv.imread(MAY, cv.IMREAD_COLOR), cv.COLOR_BGR2RGB)
+    v_clip = v_dino = None
+    if clip_mat is not None:
+        v_clip = embed_clip(rgbM)
+        v_clip = v_clip / (np.linalg.norm(v_clip) + 1e-8)
+    if dino_mat is not None:
+        v_dino = embed_dino(rgbM)
+        v_dino = v_dino / (np.linalg.norm(v_dino) + 1e-8)
+
+    # Cheap precompute for geometry on downscaled images
+    mg_small = cv.resize(mg, None, fx=downscale, fy=downscale, interpolation=cv.INTER_AREA)
+    gM = grad(mg_small); eM = cv.Canny(gM, 50, 150)
+    Hs, Ws = mg_small.shape[:2]
+
+    inside_rows = []
+
+    for npth in sorted(nov_inside_candidates):
+        row = path_to_row.get(str(npth), None)
+        if row is None:
+            continue
+
+        ng = load_gray_eq(npth)
+        if ng is None:
+            continue
+
+        # HOG (lookup)
+        coarse_hog = path_to_hog.get(str(npth), 0.0)
+
+        # CLIP/DINO similarities via sidecar rows (no per-candidate embedding)
+        s_clip = 0.0
+        s_dino = 0.0
+        if v_clip is not None and clip_mat is not None:
+            s_clip = float(clip_mat[row].dot(v_clip))
+        if v_dino is not None and dino_mat is not None:
+            s_dino = float(dino_mat[row].dot(v_dino))
+
+        # Downscale candidate
+        ngs = cv.resize(ng, (Ws, Hs), interpolation=cv.INTER_AREA)
+
+        # Geometry on downscaled
+        ng_al = ecc_align(mg_small, ngs, "affine")
+        gssim = ssim(grad(mg_small), grad(ng_al))
+        eN = cv.Canny(grad(ng_al), 50, 150)
+        ch = chamfer(eM, eN) / max(Hs, Ws)
+
+        # SIFT downscaled (or switch to ORB if needed)
+        sift_ir = sift_ransac_inlier_ratio(mg_small, ngs, model="affine")
+
+        # Blend: normalize trio locally
+        trio = np.array([coarse_hog, s_clip, s_dino], dtype=np.float32)
+        lo, hi = float(np.min(trio)), float(np.max(trio))
+        trio_n = (trio - lo) / (hi - lo + 1e-8)
+        hog_n, clip_n, dino_n = trio_n.tolist()
+
+        final = (W['hog']*hog_n + W['clip']*clip_n + W['dino']*dino_n +
+                 W['sift']*float(sift_ir) + W['ssim']*float(gssim) -
+                 W['chamfer']*float(ch))
+
+        inside_rows.append((npth, float(coarse_hog), float(gssim), float(ch), float(final)))
+
+    inside_rows.sort(key=lambda x: -x[4])
+    inside_numbered, rank_inside, metrics_inside = [], {}, {}
+    for offs, (nov_path, coarse, gssim, ch, final) in enumerate(inside_rows):
+        inside_numbered.append((offs, nov_path, coarse, gssim, ch, final))
+        rank_inside[nov_path] = offs
+        metrics_inside[nov_path] = (final, gssim)
+
+    return inside_rows, inside_numbered, rank_inside, metrics_inside
+
+def get_inside_match_metrics_multi_OLD(data, MAY, nov_inside_candidates, weights=None, idx_npz_path=None):
     print("getting inside match metrics multi ...")
     W = {'clip':0.22,'dino':0.22,'hog':0.12,'sift':0.20,'ssim':0.18,'chamfer':0.14}
     if weights: W.update(weights)
@@ -407,9 +607,9 @@ def get_inside_match_metrics_multi(data, MAY, nov_inside_candidates, weights=Non
         # CLIP/DINO on-the-fly for candidate if sidecars not wired here
         rgbN = cv.cvtColor(cv.imread(npth, cv.IMREAD_COLOR), cv.COLOR_BGR2RGB)
 
-        print("calling cos sims on clip")
+        #print("calling cos sims on clip")
         s_clip = cos_sim(v_clip, embed_clip(rgbN)) if v_clip is not None else 0.0
-        print("calling cos sims on dino")
+        #print("calling cos sims on dino")
         s_dino = cos_sim(v_dino, embed_dino(rgbN)) if v_dino is not None else 0.0
 
         # ECC for SSIM/Chamfer
@@ -537,9 +737,9 @@ def export_csv_for_may(paths: Paths, top_match_paths, args: RunArgs, idx_blob, c
     path_to_hog = {}
 
     mg = safe_load_gray_eq(paths.may_img)  # keep your existing equalization
-    print("mg stats:", type(mg), mg.dtype, mg.shape, float(mg.min()), float(mg.max()), float(mg.std()))  
+    #print("mg stats:", type(mg), mg.dtype, mg.shape, float(mg.min()), float(mg.max()), float(mg.std()))  
     q_hog = hog_vec_index_style(mg)
-    print("q_hog shape:", getattr(q_hog, "shape", None), "norm:", float(np.linalg.norm(q_hog))) 
+    #print("q_hog shape:", getattr(q_hog, "shape", None), "norm:", float(np.linalg.norm(q_hog))) 
 
     # sanity guard: match index D
     N, D_idx = feats.shape
@@ -565,10 +765,10 @@ def export_csv_for_may(paths: Paths, top_match_paths, args: RunArgs, idx_blob, c
     if q_rgb is None:
         raise OSError 
 
-    print("calling embed clip from export csv")
+    #print("calling embed clip from export csv")
     v_clip_q = embed_clip(q_rgb) #if (args.use_clip and q_rgb is not None) else None
 
-    print("calling embed dino from export csv")
+    #print("calling embed dino from export csv")
     v_dino_q = embed_dino(q_rgb) #if (args.use_dino and q_rgb is not None) else None
 
     def sim_from_sidecar(mat, q_vec, cand_path):
@@ -585,7 +785,7 @@ def export_csv_for_may(paths: Paths, top_match_paths, args: RunArgs, idx_blob, c
 
 
     ell_poly = ellipse_polygon(center_lonlat, cov_ellipse.width, cov_ellipse.height, cov_ellipse.angle)
-    print("successfuly made it past ellipse_polygon") 
+    #print("successfuly made it past ellipse_polygon") 
 
     header = [
         "may_image", "nov_image", "inside_ellipse", "distance_m",
@@ -599,16 +799,16 @@ def export_csv_for_may(paths: Paths, top_match_paths, args: RunArgs, idx_blob, c
         mgG = grad(mg); eM = cv.Canny(mgG, 50, 150)
         H, Wd = mg.shape[:2]
 
-        print("nov_candidates:",nov_candidates) 
+        #print("nov_candidates:",nov_candidates) 
 
         for npth in nov_candidates:
-            print("npth for nov_candidates: ",npth) 
+            #print("npth for nov_candidates: ",npth) 
             ng, rgbN, used_path = robust_read_gray_color(npth) 
 
             # Geometry block
             merged_poly, centroid = nov_subset_geometry_and_centroid(used_path) 
 
-            print("got merged poly and centroid!") 
+            #print("got merged poly and centroid!") 
 
             if merged_poly is None or centroid is None:
                 inside = False
@@ -617,7 +817,7 @@ def export_csv_for_may(paths: Paths, top_match_paths, args: RunArgs, idx_blob, c
                 inside = ell_poly.intersects(merged_poly)
                 dist_m = geodesic_m(center_lonlat, centroid)
 
-            print("this is npth: ",npth) 
+            #print("this is npth: ",npth) 
 
             # HOG (from index; fallback 0 if not found)
             hog_sim = path_to_hog.get(npth)
@@ -625,7 +825,7 @@ def export_csv_for_may(paths: Paths, top_match_paths, args: RunArgs, idx_blob, c
             if hog_sim is None:
                 print("[WARN] hog_sim is NONE")
                 hog_sim = path_to_hog.get(_maybe_swap_easystore(npth), 0.0)
-            print("got hog sim") 
+            #print("got hog sim") 
 
             # Read Nov image & gray
             #rgbN, _ = safe_imread(npth)
@@ -645,8 +845,6 @@ def export_csv_for_may(paths: Paths, top_match_paths, args: RunArgs, idx_blob, c
                 continue
                 #input("Press Enter to Acknowledge")
                 
-            print("safely read the Nov image!") 
-
             # CLIP/DINO sims (sidecar fast path; if missing, on-the-fly fallback)
             clip_sim = sim_from_sidecar(clip_mat, v_clip_q, used_path)
             if clip_sim is None:
@@ -680,14 +878,14 @@ def export_csv_for_may(paths: Paths, top_match_paths, args: RunArgs, idx_blob, c
             trio_n = (trio - lo) / (hi - lo + 1e-8)
             hog_n, clip_n, dino_n = trio_n.tolist()
 
-            print("ROW: ", npth)
-            print("  used_path:", used_path)
-            print("  file_size:", os.path.getsize(used_path) if os.path.exists(used_path) else -1)
-            print("  gray_sum/std:", float(ng.sum()), float(ng.std()))
-            print("  hog/clip/dino:", hog_sim, clip_sim, dino_sim)
+            # print("ROW: ", npth)
+            # print("  used_path:", used_path)
+            # print("  file_size:", os.path.getsize(used_path) if os.path.exists(used_path) else -1)
+            # print("  gray_sum/std:", float(ng.sum()), float(ng.std()))
+            # print("  hog/clip/dino:", hog_sim, clip_sim, dino_sim)
 
-            print("  inode/dev:", os.stat(used_path).st_ino, os.stat(used_path).st_dev)
-            print("  sha256  :", sha256_of(used_path))
+            # print("  inode/dev:", os.stat(used_path).st_ino, os.stat(used_path).st_dev)
+            # print("  sha256  :", sha256_of(used_path))
 
             final_w = (W['hog']*hog_n +
                        W['clip']*(clip_n if clip_sim is not None else 0.0) +

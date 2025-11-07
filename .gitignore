@@ -4,3 +4,4 @@ no_frames/
 logs/
 src/image_similarity/logs/
 src/image_similarity/__pycache__
+src/image_similarity/top100.csv
